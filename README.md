@@ -16,45 +16,33 @@ This action integrates asana with github.
 
 ### `trigger-phrase`
 
-**Required** Prefix before the task i.e ASANA TASK: https://app.asana.com/1/2/3/. For special characters in the trigger phrase refer to the examples.
+**Required** Prefix before the task i.e ASANA TASK: https://app.asana.com/1/2/3/.
 
-### `task-comment`
+### `action`
 
-**Optional** If any comment is provided, the action will add a comment to the specified asana task with the text & pull request link.
+**required** The action to be performed. Possible values are
+* `add-comment` to add the PR comment in the Asana task
 
-### `targets`
-
-**Optional** JSON array of objects having project and section where to move current task. Move task only if it exists in target project. e.g 
-```yaml
-targets: '[{"project": "Backlog", "section": "Development Done"}, {"project": "Current Sprint", "section": "In Review"}]'
-```
-if you don't want to move task omit `targets`.
+### `is_pinned`
+**optional** for `add-comment`. Pinned the PR comment when set to `true`
 
 ## Sample PR Description
 ``
-**Asana Task:** [Task Name](https://app.asana.com/0/1/2)
+Asana Task: https://app.asana.com/0/1/2
 ``
 
-## Examples
-
-#### Without special characters:
+## Example Usage
 
 ```yaml
-uses: insurify/github-asana-action@v1.0.3
+uses: aitorvs/github-asana-action@v1.0.3
 with:
   asana-pat: 'Your PAT'
-  task-comment: 'View Pull Request Here: '
   trigger-phrase: 'Asana Task:'
-  targets: '[{"project": "Backlog", "section": "Development Done"}, {"project": "Current Sprint", "section": "In Review"}]'
+  action: 'add-comment'
+  is_pinned: true
 ```
+Sample PR description:
 
-#### With special characters:
-
-```yaml
-uses: insurify/github-asana-action@v1.0.3
-with:
-  asana-pat: 'Your PAT'
-  task-comment: 'View Pull Request Here: '
-  trigger-phrase: "\\*\\*Asana Task:\\*\\*"
-  targets: '[{"project": "Backlog", "section": "Development Done"}, {"project": "Current Sprint", "section": "In Review"}]'
+```
+Asana Task: https://app.asana.com/0/1/
 ```
