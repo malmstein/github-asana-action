@@ -6,13 +6,18 @@ This action integrates asana with github.
 ### Prerequisites
 
 - Asana account with the permission on the particular project you want to integrate with.
-- Must provide the task url in the PR description.
+- Asana project where the issues will be added to.
 
 ## Inputs
 
 ### `asana-pat`
 
 **Required** Your public access token of asana, you can find it in [asana docs](https://developers.asana.com/docs/#authentication-basics).
+
+### `asana-project`
+
+**Required** The Asana project ID where the new task will be added i.e ASANA PROJECT: https://app.asana.com/0/1174433894299346
+
 
 ### `trigger-phrase`
 
@@ -21,28 +26,14 @@ This action integrates asana with github.
 ### `action`
 
 **required** The action to be performed. Possible values are
-* `add-comment` to add the PR comment in the Asana task
-
-### `is_pinned`
-**optional** for `add-comment`. Pinned the PR comment when set to `true`
-
-## Sample PR Description
-``
-Asana Task: https://app.asana.com/0/1/2
-``
+* `create-task` to create a task based on the ISSUE
 
 ## Example Usage
 
 ```yaml
-uses: aitorvs/github-asana-action@v1.0.3
+uses: malmstein/github-asana-action@v0.1.0
 with:
   asana-pat: 'Your PAT'
-  trigger-phrase: 'Asana Task:'
-  action: 'add-comment'
-  is_pinned: true
-```
-Sample PR description:
-
-```
-Asana Task: https://app.asana.com/0/1/
+  asana-project: 'Asana Project Id'
+  action: 'create-task'
 ```

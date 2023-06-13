@@ -19,17 +19,27 @@ async function addComment(client, taskId, text, isPinned) {
     }
 }
 
+async function createTask(client, projectId, name, text) {
+    try {
+        return await client.tasks.createTask({
+            notes: notes,
+            text: text,
+            projects: {projectId}
+        });
+    } catch (error) {
+        console.error('rejecting promise', error);
+    }
+}
+
 async function action() {
     const
         ASANA_PAT = core.getInput('asana-pat'),
+        ASANA_PROJECT_ID = core.getInput('asana-project', {required: true}),
         ACTION = core.getInput('action', {required: true}),
-        TRIGGER_PHRASE = core.getInput('trigger-phrase'),
-        PULL_REQUEST = github.context.payload.pull_request,
-        REGEX_STRING = `${TRIGGER_PHRASE} https:\\/\\/app.asana.com\\/(\\d+)\\/(?<project>\\d+)\\/(?<task>\\d+).*?`,
-        REGEX = new RegExp(REGEX_STRING, 'g')
+        ISSUE = github.context.payload.issue,
     ;
 
-    console.log('pull_request', PULL_REQUEST);
+    console.log('issue', ISSUE);
 
     const client = await buildClient(ASANA_PAT);
 
@@ -37,24 +47,19 @@ async function action() {
         throw new Error('client authorization failed');
     }
 
-    console.info('looking for asana task link in body', PULL_REQUEST.body, 'regex', REGEX_STRING);
-    let foundTasks = [];
-    while((parseAsanaUrl = REGEX.exec(PULL_REQUEST.body)) !== null) {
-        const taskId = parseAsanaUrl.groups.task;
-        if (!taskId) {
-            core.error(`Invalid Asana task URL after trigger-phrase ${TRIGGER_PHRASE}`);
-            continue;
-        }
-        foundTasks.push(taskId);
-    }
-    console.info(`found ${foundTasks.length} tasksIds:`, foundTasks.join(','));
-
+    console.info('creating asana task from issue', ISSUE.body);
     console.info('calling', ACTION);
 
     switch (ACTION) {
+        case 'create-task': {
+            const TASK_DESCRIPTION = `${ISSUE.body}`,
+            const TASK_DESCRIPTION = `Github Issue: ${ISSUE.title}`,
+            const task = createTask(client, ASANA_PROJECT_ID, TASK_DESCRIPTION)
+            return task
+        }
         case 'add-comment': {
             const
-                TASK_COMMENT = `PR: ${PULL_REQUEST.html_url}`,
+                TASK_COMMENT = `PR: ${ISSUE.html_url}`,
                 // htmlText = core.getInput('text', {required: true}),
                 isPinned = core.getInput('is-pinned') === 'true';
 

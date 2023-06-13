@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/insurify/github-actions.git"
+    "url": "git+https://github.com/malmstein/github-actions.git"
   },
   "keywords": [
     "github-actions",
