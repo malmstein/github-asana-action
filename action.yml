@@ -1,5 +1,5 @@
-name: 'Asana Git Integration'
-description: 'Asana Github Actions'
+name: 'Asana Github Issues Integration'
+description: 'Create Asana task based on a Github Issue'
 inputs:
   asana-pat:
     description: 'Asana Public Access Token.'
