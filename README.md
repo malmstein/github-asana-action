@@ -31,7 +31,7 @@ This action integrates asana with github.
 ## Example Usage
 
 ```yaml
-uses: malmstein/github-asana-action@v0.1.0
+uses: malmstein/github-asana-action@v1.0.4
 with:
   asana-pat: 'Your PAT'
   asana-project: 'Asana Project Id'

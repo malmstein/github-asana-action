@@ -8,23 +8,24 @@ async function buildClient(asanaPAT) {
         logAsanaChangeWarnings: false
     }).useAccessToken(asanaPAT).authorize();
 }
-async function addComment(client, taskId, text, isPinned) {
+
+async function createTask(client, projectId, name, description) {
     try {
-        return await client.tasks.addComment(taskId, {
-            text: text,
-            is_pinned: isPinned,
+        return await client.tasks.createTask({
+            name: name,
+            notes: description,
+            projects: { projectId }
         });
     } catch (error) {
         console.error('rejecting promise', error);
     }
 }
 
-async function createTask(client, projectId, name, text) {
+async function addComment(client, taskId, text, isPinned) {
     try {
-        return await client.tasks.createTask({
-            notes: notes,
+        return await client.tasks.addComment(taskId, {
             text: text,
-            projects: {projectId}
+            is_pinned: isPinned,
         });
     } catch (error) {
         console.error('rejecting promise', error);
@@ -52,9 +53,17 @@ async function action() {
 
     switch (ACTION) {
         case 'create-task': {
-            const TASK_DESCRIPTION = `${ISSUE.body}`,
-            const TASK_DESCRIPTION = `Github Issue: ${ISSUE.title}`,
-            const task = createTask(client, ASANA_PROJECT_ID, TASK_DESCRIPTION)
+            const TASK_DESCRIPTION = `URL: ${ISSUE.html_url}, Description: ${ISSUE.body}`,
+            const TASK_NAME = `Github Issue: ${ISSUE.title}`,
+            const task = createTask(client, ASANA_PROJECT_ID, TASK_NAME, TASK_DESCRIPTION)
+
+            const
+                TASK_COMMENT = `PR: ${ISSUE.html_url}`,
+                taskId = task.data.gid,
+                isPinned = core.getInput('is-pinned') === 'true';
+
+            addComment(client, taskId, TASK_COMMENT, isPinned)
+
             return task
         }
         case 'add-comment': {
@@ -69,22 +78,6 @@ async function action() {
                 comments.push(comment)
             }
             return comments;
-        }
-        case 'complete-task': {
-            const isComplete = core.getInput('is-complete') === 'true';
-            const taskIds = [];
-            for(const taskId of foundTasks) {
-                console.info("marking task", taskId, isComplete ? 'complete' : 'incomplete');
-                try {
-                    await client.tasks.update(taskId, {
-                        completed: isComplete
-                    });
-                } catch (error) {
-                    console.error('rejecting promise', error);
-                }
-                taskIds.push(taskId);
-            }
-            return taskIds;
         }
         default:
             core.setFailed("unexpected action ${ACTION}");
