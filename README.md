@@ -18,11 +18,6 @@ This action integrates asana with github.
 
 **Required** The Asana project ID where the new task will be added i.e ASANA PROJECT: https://app.asana.com/0/1174433894299346
 
-
-### `trigger-phrase`
-
-**Required** Prefix before the task i.e ASANA TASK: https://app.asana.com/1/2/3/.
-
 ### `action`
 
 **required** The action to be performed. Possible values are
@@ -31,7 +26,7 @@ This action integrates asana with github.
 ## Example Usage
 
 ```yaml
-uses: malmstein/github-asana-action@v1.0.4
+uses: malmstein/github-asana-action@v0.4.0
 with:
   asana-pat: 'Your PAT'
   asana-project: 'Asana Project Id'
