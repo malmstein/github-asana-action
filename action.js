@@ -49,9 +49,9 @@ async function createIssueTask(client){
     console.info('creating asana task from issue', ISSUE);
 
     const 
-        TASK_DESCRIPTION = `URL: ${ISSUE.html_url}, Description: ${ISSUE.body}`,
+        TASK_DESCRIPTION = `Description: ${ISSUE.body}`,
         TASK_NAME = `Github Issue: ${ISSUE.title}`,
-        TASK_COMMENT = `Issue: ${ISSUE.html_url}`
+        TASK_COMMENT = `Issue: ${ISSUE.html_url}`;
 
     client.tasks.createTask({name: TASK_NAME, notes: TASK_DESCRIPTION, projects: { ASANA_PROJECT_ID }})
         .then((result) => {
@@ -61,8 +61,6 @@ async function createIssueTask(client){
                 is_pinned: isPinned,
             });
         });
-
-    const comment = addComment(client, taskId, TASK_COMMENT, isPinned)
 }
 
 async function addPRComment(client){
