@@ -25,7 +25,8 @@ async function createTask(client, name, description, projectId) {
     try {
         return await client.tasks.createTask({name: name, 
             notes: description, 
-            projects: { projectId }
+            projects: { projectId },
+            pretty: true
         });
     } catch (error) {
         console.error('rejecting promise', error);
