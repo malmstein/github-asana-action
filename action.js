@@ -55,8 +55,9 @@ async function findAsanaTasks(){
 
 async function createIssueTask(client){
     const ISSUE = github.context.payload.issue;
+    const ASANA_PROJECT_ID = core.getInput('asana-project');
 
-    console.info('creating asana task from issue', ISSUE.body);
+    console.info('creating asana task from issue', ISSUE.title);
 
     const 
         TASK_DESCRIPTION = `URL: ${ISSUE.html_url}, Description: ${ISSUE.body}`,
