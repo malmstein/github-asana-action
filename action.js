@@ -41,7 +41,7 @@ async function findAsanaTasks(){
     return foundTasks
 }
 
-async function createIssueTask(client){
+async function createIssueTask(){
     const ASANA_PAT = core.getInput('asana-pat');
     const ISSUE = github.context.payload.issue;
     const ASANA_PROJECT_ID = core.getInput('asana-project');
@@ -123,7 +123,7 @@ async function action() {
 
     switch (ACTION) {
         case 'create-issue-task': {
-            createIssueTask(client)
+            createIssueTask()
         }
         case 'add-pr-comment': {
             addPRComment(client)
