@@ -21,11 +21,11 @@ async function addComment(client, taskId, text, isPinned) {
 }
 
 
-async function createTask(client, taskId, text, isPinned) {
+async function createTask(client, name, description, projectId) {
     try {
-        return await client.tasks.createTask({name: TASK_NAME, 
-            notes: TASK_DESCRIPTION, 
-            projects: { ASANA_PROJECT_ID }
+        return await client.tasks.createTask({name: name, 
+            notes: description, 
+            projects: { projectId }
         });
     } catch (error) {
         console.error('rejecting promise', error);
@@ -65,19 +65,11 @@ async function createIssueTask(client){
     const TASK_NAME = `Github Issue: ${ISSUE.title}`;
     const TASK_COMMENT = `Issue: ${ISSUE.html_url}`;
 
-    try {
-        await client.tasks.createTask({name: TASK_NAME, 
-            notes: TASK_DESCRIPTION, 
-            projects: { ASANA_PROJECT_ID }
-        }).then((result) => {
-            console.info('task created', result);
-            client.tasks.addComment(result.data.gid, {
-                text: TASK_COMMENT,
-                is_pinned: isPinned,
-            });
-        });
-    } catch (error) {
-        console.error('rejecting promise', error);
+    const task = createTask(client, TASK_NAME, TASK_DESCRIPTION, ASANA_PROJECT_ID)
+    if (task === null) {
+        throw new Error('task creation failed');
+    } else {
+        console.info('task created', task);
     }
 }
 
