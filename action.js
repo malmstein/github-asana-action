@@ -42,6 +42,7 @@ async function findAsanaTasks(){
 }
 
 async function createIssueTask(client){
+    const ASANA_PAT = core.getInput('asana-pat');
     const ISSUE = github.context.payload.issue;
     const ASANA_PROJECT_ID = core.getInput('asana-project');
     const isPinned = core.getInput('is-pinned') === 'true';
@@ -52,6 +53,14 @@ async function createIssueTask(client){
     const TASK_NAME = `Github Issue: ${ISSUE.title}`;
     const TASK_COMMENT = `Issue: ${ISSUE.html_url}`;
 
+    const client = await buildClient(ASANA_PAT);
+
+    if (client === null) {
+        throw new Error('client authorization failed');
+    } else {
+        console.info('asana client created');
+    }
+
     client.tasks.createTask({name: ISSUE.title, notes: ISSUE.body, projects: { ASANA_PROJECT_ID }})
         .then((result) => {
             console.log(result);
@@ -60,6 +69,7 @@ async function createIssueTask(client){
             //     is_pinned: isPinned,
             // });
         });
+
 }
 
 async function addPRComment(client){
