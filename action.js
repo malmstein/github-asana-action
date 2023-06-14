@@ -123,13 +123,16 @@ async function action() {
 
     switch (ACTION) {
         case 'create-issue-task': {
-            createIssueTask()
+            createIssueTask();
+            break;
         }
         case 'add-pr-comment': {
-            addPRComment(client)
+            addPRComment(client);
+            break;
         }
         case 'complete-pr-task': {
-            completePRTask(client)
+            completePRTask(client);
+            break;
         }
         default:
             core.setFailed(`unexpected action ${ACTION}`);
