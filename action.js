@@ -25,7 +25,7 @@ async function findAsanaTasks(){
         TRIGGER_PHRASE = core.getInput('trigger-phrase'),
         PULL_REQUEST = github.context.payload.pull_request,
         REGEX_STRING = `${TRIGGER_PHRASE} https:\\/\\/app.asana.com\\/(\\d+)\\/(?<project>\\d+)\\/(?<task>\\d+).*?`,
-        REGEX = new RegExp(REGEX_STRING, 'g')
+        REGEX = new RegExp(REGEX_STRING, 'g');
  
     console.info('looking for asana task link in body', PULL_REQUEST.body, 'regex', REGEX_STRING);
     let foundTasks = [];
@@ -48,18 +48,17 @@ async function createIssueTask(client){
 
     console.info('creating asana task from issue', ISSUE);
 
-    const 
-        TASK_DESCRIPTION = `Description: ${ISSUE.body}`,
-        TASK_NAME = `Github Issue: ${ISSUE.title}`,
-        TASK_COMMENT = `Issue: ${ISSUE.html_url}`;
+    const TASK_DESCRIPTION = `Description: ${ISSUE.body}`;
+    const TASK_NAME = `Github Issue: ${ISSUE.title}`;
+    const TASK_COMMENT = `Issue: ${ISSUE.html_url}`;
 
-    client.tasks.createTask({name: TASK_NAME, notes: TASK_DESCRIPTION, projects: { ASANA_PROJECT_ID }})
+    client.tasks.createTask({name: ISSUE.title, notes: ISSUE.body, projects: { ASANA_PROJECT_ID }})
         .then((result) => {
             console.log(result);
-            client.tasks.addComment(result.data.gid, {
-                text: TASK_COMMENT,
-                is_pinned: isPinned,
-            });
+            // client.tasks.addComment(result.data.gid, {
+            //     text: TASK_COMMENT,
+            //     is_pinned: isPinned,
+            // });
         });
 }
 
@@ -67,7 +66,7 @@ async function addPRComment(client){
     const 
         PULL_REQUEST = github.context.payload.pull_request,
         TASK_COMMENT = `PR: ${PULL_REQUEST.html_url}`,
-        isPinned = core.getInput('is-pinned') === 'true'
+        isPinned = core.getInput('is-pinned') === 'true';
 
     const foundTasks = findAsanaTasks()
 
@@ -102,8 +101,7 @@ async function completePRTask(client){
 async function action() {
     const
         ASANA_PAT = core.getInput('asana-pat'),
-        ACTION = core.getInput('action', {required: true})
-    ;
+        ACTION = core.getInput('action', {required: true});
 
     const client = await buildClient(ASANA_PAT);
 
