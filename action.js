@@ -9,18 +9,6 @@ async function buildClient(asanaPAT) {
     }).useAccessToken(asanaPAT).authorize();
 }
 
-async function createTask(client, projectId, name, description) {
-    try {
-        return await client.tasks.createTask({
-            name: name,
-            notes: description,
-            projects: { projectId }
-        });
-    } catch (error) {
-        console.error('rejecting promise', error);
-    }
-}
-
 async function addComment(client, taskId, text, isPinned) {
     try {
         return await client.tasks.addComment(taskId, {
@@ -34,10 +22,10 @@ async function addComment(client, taskId, text, isPinned) {
 
 async function findAsanaTasks(){
     const
-    TRIGGER_PHRASE = core.getInput('trigger-phrase'),
-    PULL_REQUEST = github.context.payload.pull_request,
-    REGEX_STRING = `${TRIGGER_PHRASE} https:\\/\\/app.asana.com\\/(\\d+)\\/(?<project>\\d+)\\/(?<task>\\d+).*?`,
-    REGEX = new RegExp(REGEX_STRING, 'g')
+        TRIGGER_PHRASE = core.getInput('trigger-phrase'),
+        PULL_REQUEST = github.context.payload.pull_request,
+        REGEX_STRING = `${TRIGGER_PHRASE} https:\\/\\/app.asana.com\\/(\\d+)\\/(?<project>\\d+)\\/(?<task>\\d+).*?`,
+        REGEX = new RegExp(REGEX_STRING, 'g')
  
     console.info('looking for asana task link in body', PULL_REQUEST.body, 'regex', REGEX_STRING);
     let foundTasks = [];
@@ -74,9 +62,7 @@ async function createIssueTask(client){
             });
         });
 
-    addComment(client, taskId, TASK_COMMENT, isPinned)
-
-    return task
+    const comment = addComment(client, taskId, TASK_COMMENT, isPinned)
 }
 
 async function addPRComment(client){
