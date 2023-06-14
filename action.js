@@ -56,19 +56,23 @@ async function findAsanaTasks(){
 async function createIssueTask(client){
     const ISSUE = github.context.payload.issue;
     const ASANA_PROJECT_ID = core.getInput('asana-project');
+    const isPinned = core.getInput('is-pinned') === 'true';
 
     console.info('creating asana task from issue', ISSUE.title);
 
     const 
         TASK_DESCRIPTION = `URL: ${ISSUE.html_url}, Description: ${ISSUE.body}`,
-        TASK_NAME = `Github Issue: ${ISSUE.title}`
+        TASK_NAME = `Github Issue: ${ISSUE.title}`,
         TASK_COMMENT = `Issue: ${ISSUE.html_url}`
-    
-    const task = createTask(client, ASANA_PROJECT_ID, TASK_NAME, TASK_DESCRIPTION)
 
-    const
-        taskId = task.data.gid,
-        isPinned = core.getInput('is-pinned') === 'true';
+    client.tasks.createTask({name: TASK_NAME,notes: TASK_DESCRIPTION, projects: { ASANA_PROJECT_ID }})
+        .then((result) => {
+            console.log(result);
+            client.tasks.addComment(result.data.gid, {
+                text: TASK_COMMENT,
+                is_pinned: isPinned,
+            });
+        });
 
     addComment(client, taskId, TASK_COMMENT, isPinned)
 
@@ -136,7 +140,7 @@ async function action() {
             completePRTask(client)
         }
         default:
-            core.setFailed("unexpected action ${ACTION}");
+            core.setFailed(`unexpected action ${ACTION}`);
     }
 }
 
