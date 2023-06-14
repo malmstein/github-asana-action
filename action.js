@@ -32,15 +32,89 @@ async function addComment(client, taskId, text, isPinned) {
     }
 }
 
+async function findAsanaTasks(){
+    const
+    TRIGGER_PHRASE = core.getInput('trigger-phrase'),
+    PULL_REQUEST = github.context.payload.pull_request,
+    REGEX_STRING = `${TRIGGER_PHRASE} https:\\/\\/app.asana.com\\/(\\d+)\\/(?<project>\\d+)\\/(?<task>\\d+).*?`,
+    REGEX = new RegExp(REGEX_STRING, 'g')
+
+    console.info('looking for asana task link in body', PULL_REQUEST.body, 'regex', REGEX_STRING);
+    let foundTasks = [];
+    while((parseAsanaUrl = REGEX.exec(PULL_REQUEST.body)) !== null) {
+        const taskId = parseAsanaUrl.groups.task;
+        if (!taskId) {
+            core.error(`Invalid Asana task URL after trigger-phrase ${TRIGGER_PHRASE}`);
+            continue;
+        }
+        foundTasks.push(taskId);
+    }
+    console.info(`found ${foundTasks.length} tasksIds:`, foundTasks.join(','));
+    return foundTasks
+}
+
+async function createIssueTask(client){
+    const ISSUE = github.context.payload.issue;
+
+    console.info('creating asana task from issue', ISSUE.body);
+
+    const 
+        TASK_DESCRIPTION = `URL: ${ISSUE.html_url}, Description: ${ISSUE.body}`,
+        TASK_NAME = `Github Issue: ${ISSUE.title}`
+        TASK_COMMENT = `Issue: ${ISSUE.html_url}`
+    
+    const task = createTask(client, ASANA_PROJECT_ID, TASK_NAME, TASK_DESCRIPTION)
+
+    const
+        taskId = task.data.gid,
+        isPinned = core.getInput('is-pinned') === 'true';
+
+    addComment(client, taskId, TASK_COMMENT, isPinned)
+
+    return task
+}
+
+async function addPRComment(client){
+    const 
+        PULL_REQUEST = github.context.payload.pull_request,
+        TASK_COMMENT = `PR: ${PULL_REQUEST.html_url}`,
+        isPinned = core.getInput('is-pinned') === 'true'
+
+    const foundTasks = findAsanaTasks()
+
+    const comments = [];
+    for (const taskId of foundTasks) {
+        const comment = addComment(client, taskId, TASK_COMMENT, isPinned)
+        comments.push(comment)
+    }
+    return comments;
+}
+
+async function completePRTask(client){
+    const isComplete = core.getInput('is-complete') === 'true';
+
+    const foundTasks = findAsanaTasks()
+
+    const taskIds = [];
+    for(const taskId of foundTasks) {
+        console.info("marking task", taskId, isComplete ? 'complete' : 'incomplete');
+        try {
+            await client.tasks.update(taskId, {
+                completed: isComplete
+            });
+        } catch (error) {
+            console.error('rejecting promise', error);
+        }
+        taskIds.push(taskId);
+    }
+    return taskIds;
+}
+
 async function action() {
     const
         ASANA_PAT = core.getInput('asana-pat'),
-        ASANA_PROJECT_ID = core.getInput('asana-project', {required: true}),
-        ACTION = core.getInput('action', {required: true}),
-        ISSUE = github.context.payload.issue,
+        ACTION = core.getInput('action', {required: true})
     ;
-
-    console.log('issue', ISSUE);
 
     const client = await buildClient(ASANA_PAT);
 
@@ -48,36 +122,17 @@ async function action() {
         throw new Error('client authorization failed');
     }
 
-    console.info('creating asana task from issue', ISSUE.body);
     console.info('calling', ACTION);
 
     switch (ACTION) {
-        case 'create-task': {
-            const TASK_DESCRIPTION = `URL: ${ISSUE.html_url}, Description: ${ISSUE.body}`,
-            const TASK_NAME = `Github Issue: ${ISSUE.title}`,
-            const task = createTask(client, ASANA_PROJECT_ID, TASK_NAME, TASK_DESCRIPTION)
-
-            const
-                TASK_COMMENT = `PR: ${ISSUE.html_url}`,
-                taskId = task.data.gid,
-                isPinned = core.getInput('is-pinned') === 'true';
-
-            addComment(client, taskId, TASK_COMMENT, isPinned)
-
-            return task
+        case 'create-issue-task': {
+            createIssueTask(client)
         }
-        case 'add-comment': {
-            const
-                TASK_COMMENT = `PR: ${ISSUE.html_url}`,
-                // htmlText = core.getInput('text', {required: true}),
-                isPinned = core.getInput('is-pinned') === 'true';
-
-            const comments = [];
-            for (const taskId of foundTasks) {
-                const comment = addComment(client, taskId, TASK_COMMENT, isPinned)
-                comments.push(comment)
-            }
-            return comments;
+        case 'add-pr-comment': {
+            addPRComment(client)
+        }
+        case 'complete-pr-task': {
+            completePRTask(client)
         }
         default:
             core.setFailed("unexpected action ${ACTION}");
