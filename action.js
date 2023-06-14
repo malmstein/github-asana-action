@@ -20,6 +20,19 @@ async function addComment(client, taskId, text, isPinned) {
     }
 }
 
+
+async function createTask(client, taskId, text, isPinned) {
+    try {
+        return await client.tasks.createTask({name: TASK_NAME, 
+            notes: TASK_DESCRIPTION, 
+            projects: { ASANA_PROJECT_ID }
+        });
+    } catch (error) {
+        console.error('rejecting promise', error);
+    }
+}
+
+
 async function findAsanaTasks(){
     const
         TRIGGER_PHRASE = core.getInput('trigger-phrase'),
@@ -46,27 +59,26 @@ async function createIssueTask(client){
     const ASANA_PROJECT_ID = core.getInput('asana-project');
     const isPinned = core.getInput('is-pinned') === 'true';
 
-    console.info('creating asana task from issue', ISSUE);
+    console.info('creating asana task from issue', ISSUE.title);
 
     const TASK_DESCRIPTION = `Description: ${ISSUE.body}`;
     const TASK_NAME = `Github Issue: ${ISSUE.title}`;
     const TASK_COMMENT = `Issue: ${ISSUE.html_url}`;
 
-    if (client === null) {
-        throw new Error('client authorization failed');
-    } else {
-        console.info('asana client created');
-    }
-
-    client.tasks.createTask({name: TASK_NAME, notes: TASK_DESCRIPTION, projects: { ASANA_PROJECT_ID }})
-        .then((result) => {
+    try {
+        await client.tasks.createTask({name: TASK_NAME, 
+            notes: TASK_DESCRIPTION, 
+            projects: { ASANA_PROJECT_ID }
+        }).then((result) => {
             console.info('task created', result);
             client.tasks.addComment(result.data.gid, {
                 text: TASK_COMMENT,
                 is_pinned: isPinned,
             });
         });
-
+    } catch (error) {
+        console.error('rejecting promise', error);
+    }
 }
 
 async function addPRComment(client){
