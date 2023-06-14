@@ -41,8 +41,7 @@ async function findAsanaTasks(){
     return foundTasks
 }
 
-async function createIssueTask(){
-    const ASANA_PAT = core.getInput('asana-pat');
+async function createIssueTask(client){
     const ISSUE = github.context.payload.issue;
     const ASANA_PROJECT_ID = core.getInput('asana-project');
     const isPinned = core.getInput('is-pinned') === 'true';
@@ -53,21 +52,19 @@ async function createIssueTask(){
     const TASK_NAME = `Github Issue: ${ISSUE.title}`;
     const TASK_COMMENT = `Issue: ${ISSUE.html_url}`;
 
-    const client = await buildClient(ASANA_PAT);
-
     if (client === null) {
         throw new Error('client authorization failed');
     } else {
         console.info('asana client created');
     }
 
-    client.tasks.createTask({name: ISSUE.title, notes: ISSUE.body, projects: { ASANA_PROJECT_ID }})
+    client.tasks.createTask({name: TASK_NAME, notes: TASK_DESCRIPTION, projects: { ASANA_PROJECT_ID }})
         .then((result) => {
-            console.log(result);
-            // client.tasks.addComment(result.data.gid, {
-            //     text: TASK_COMMENT,
-            //     is_pinned: isPinned,
-            // });
+            console.info('task created', result);
+            client.tasks.addComment(result.data.gid, {
+                text: TASK_COMMENT,
+                is_pinned: isPinned,
+            });
         });
 
 }
@@ -123,7 +120,7 @@ async function action() {
 
     switch (ACTION) {
         case 'create-issue-task': {
-            createIssueTask();
+            createIssueTask(client);
             break;
         }
         case 'add-pr-comment': {
@@ -131,7 +128,7 @@ async function action() {
             break;
         }
         case 'complete-pr-task': {
-            completePRTask(client);
+            completePRTask(client)
             break;
         }
         default:
