@@ -38,7 +38,7 @@ async function findAsanaTasks(){
     PULL_REQUEST = github.context.payload.pull_request,
     REGEX_STRING = `${TRIGGER_PHRASE} https:\\/\\/app.asana.com\\/(\\d+)\\/(?<project>\\d+)\\/(?<task>\\d+).*?`,
     REGEX = new RegExp(REGEX_STRING, 'g')
-
+ 
     console.info('looking for asana task link in body', PULL_REQUEST.body, 'regex', REGEX_STRING);
     let foundTasks = [];
     while((parseAsanaUrl = REGEX.exec(PULL_REQUEST.body)) !== null) {
