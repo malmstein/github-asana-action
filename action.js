@@ -86,7 +86,7 @@ async function createIssueTask(client){
     client.tasks.createTask({name: TASK_NAME, 
         notes: TASK_DESCRIPTION, 
         projects: [ASANA_PROJECT_ID],
-        custom_fields: {[ASANA_CUSTOM_FIELD_ID]: ISSUE.html_url},
+        custom_fields: {[ASANA_CUSTOM_FIELD_ID]: ISSUE.number.toString},
         pretty: true})
             .then((result) => {
                 console.log('task created', result);
