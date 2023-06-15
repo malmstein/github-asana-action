@@ -150,7 +150,7 @@ async function action() {
     switch (ACTION) {
         case 'create-issue-task': {
             const result = await createIssueTask(client);
-            console.info("task created", result);
+            core.setOutput(result)
             break;
         }
         case 'add-pr-comment': {
