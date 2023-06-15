@@ -72,7 +72,7 @@ function createTask(client, name, description, issue, comment, projectId, custom
     }
 }
 
-async function createIssueTask(client){
+function createIssueTask(client){
     const ISSUE = github.context.payload.issue;
     const ASANA_PROJECT_ID = core.getInput('asana-project');
     const ASANA_CUSTOM_FIELD_ID = core.getInput('asana-custom-field');
@@ -83,7 +83,19 @@ async function createIssueTask(client){
     const TASK_NAME = `Github Issue: ${ISSUE.title}`;
     const TASK_COMMENT = `Link to Issue: ${ISSUE.html_url}`;
 
-    createTask(client, TASK_NAME, TASK_DESCRIPTION, ISSUE.number, TASK_COMMENT, ASANA_PROJECT_ID, ASANA_CUSTOM_FIELD_ID)
+    client.tasks.createTask({name: TASK_NAME, 
+        notes: TASK_DESCRIPTION, 
+        projects: [ASANA_PROJECT_ID],
+        custom_fields: {[ASANA_CUSTOM_FIELD_ID]: ISSUE.number},
+        pretty: true})
+            .then((result) => {
+                console.log('task created', result);
+                client.stories.createStoryForTask(result.gid, {
+                    text: TASK_COMMENT,
+                    is_pinned: true,
+                });
+    
+            });
 }
 
 async function addPRComment(client){
