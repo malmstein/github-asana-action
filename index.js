@@ -1,5 +1,7 @@
 const core = require('@actions/core');
 const action = require('./action');
+const github = require('@actions/github');
+const asana = require('asana');
 
 const
 ASANA_PAT = core.getInput('asana-pat'),
