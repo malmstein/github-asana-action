@@ -23,7 +23,7 @@ async function addComment(client, taskId, text, isPinned) {
 
 function createTask(client, name, description, projectId) {
     try {
-        client.tasks.createTask({name: name, 
+        return client.tasks.createTask({name: name, 
             notes: description, 
             projects: { projectId },
             pretty: true})
