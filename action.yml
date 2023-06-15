@@ -7,6 +7,9 @@ inputs:
   asana-project:
     description: 'Asana Project Id where the Tasks will be added.'
     required: true
+  asana-custom-field:
+    description: 'Asana Project Custom Field ID that will be used to link the Issue URL.'
+    required: true
   action:
     description: 'Action that will be executed. `create-task` to create a task based on the ISSUE'
     required: true
