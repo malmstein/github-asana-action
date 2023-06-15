@@ -74,9 +74,9 @@ async function createIssueTask(client){
 
     const TASK_DESCRIPTION = `Description: ${ISSUE.body}`;
     const TASK_NAME = `Github Issue: ${ISSUE.title}`;
-    const TASK_COMMENT = `Link to Issue: ${ISSUE.number}`;
+    const TASK_COMMENT = `Link to Issue: ${ISSUE.html_url}`;
 
-    const task = await createTask(client, TASK_NAME, TASK_DESCRIPTION, ISSUE.html_url, ASANA_PROJECT_ID, ASANA_CUSTOM_FIELD_ID)
+    const task = await createTask(client, TASK_NAME, TASK_DESCRIPTION, ISSUE.number, ASANA_PROJECT_ID, ASANA_CUSTOM_FIELD_ID)
     
     if (task === null) {
         throw new Error('task creation failed');
