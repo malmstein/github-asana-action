@@ -53,7 +53,7 @@ function createStory(client, taskId, text, isPinned) {
     }
 }
 
-function createTask(client, name, description, issue, comment, projectId, customFieldId) {
+async function createTask(client, name, description, issue, comment, projectId, customFieldId) {
     try {
         client.tasks.createTask({name: name, 
             notes: description, 
@@ -62,7 +62,7 @@ function createTask(client, name, description, issue, comment, projectId, custom
             pretty: true})
             .then((result) => {
                 console.log('task created', result);
-                client.stories.createStoryForTask(result.gid, {
+                return client.stories.createStoryForTask(result.gid, {
                     text: comment,
                     is_pinned: isPinned,
                 });
@@ -72,7 +72,7 @@ function createTask(client, name, description, issue, comment, projectId, custom
     }
 }
 
-function createIssueTask(client){
+async function createIssueTask(client){
     const ISSUE = github.context.payload.issue;
     const ASANA_PROJECT_ID = core.getInput('asana-project');
     const ASANA_CUSTOM_FIELD_ID = core.getInput('asana-custom-field');
@@ -90,7 +90,7 @@ function createIssueTask(client){
         pretty: true})
             .then((result) => {
                 console.log('task created', result);
-                client.stories.createStoryForTask(result.gid, {
+                return client.stories.createStoryForTask(result.gid, {
                     text: TASK_COMMENT,
                     is_pinned: true,
                 });
@@ -149,7 +149,8 @@ async function action() {
 
     switch (ACTION) {
         case 'create-issue-task': {
-            createIssueTask(client);
+            const result = await createIssueTask(client);
+            console.info("task created", result);
             break;
         }
         case 'add-pr-comment': {
