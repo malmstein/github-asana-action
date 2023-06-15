@@ -23,12 +23,14 @@ async function addComment(client, taskId, text, isPinned) {
 
 function createTask(client, name, description, projectId) {
     try {
-        console.log('client', client, client.tasks)
-        return client.tasks.createTask({name: name, 
+        client.tasks.createTask({name: name, 
             notes: description, 
             projects: { projectId },
-            pretty: true
-        });
+            pretty: true})
+                .then((result) => {
+                    console.log(result);
+                    return result
+                });
     } catch (error) {
         console.error('rejecting promise', error);
     }
