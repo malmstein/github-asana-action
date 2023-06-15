@@ -72,7 +72,7 @@ async function createTask(client, name, description, issue, comment, projectId, 
     }
 }
 
-async function createIssueTask(client){
+function createIssueTask(client){
     const ISSUE = github.context.payload.issue;
     const ASANA_PROJECT_ID = core.getInput('asana-project');
     const ASANA_CUSTOM_FIELD_ID = core.getInput('asana-custom-field');
@@ -134,12 +134,12 @@ async function completePRTask(client){
     return taskIds;
 }
 
-async function action() {
+function action() {
     const
         ASANA_PAT = core.getInput('asana-pat'),
         ACTION = core.getInput('action', {required: true});
 
-    const client = await buildClient(ASANA_PAT);
+    const client = buildClient(ASANA_PAT);
 
     if (client === null) {
         throw new Error('client authorization failed');
@@ -149,7 +149,7 @@ async function action() {
 
     switch (ACTION) {
         case 'create-issue-task': {
-            const result = await createIssueTask(client);
+            const result = createIssueTask(client);
             console.info("task created", result);
             break;
         }
