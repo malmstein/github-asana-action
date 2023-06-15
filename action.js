@@ -42,9 +42,9 @@ async function addComment(client, taskId, text, isPinned) {
     }
 }
 
-async function createStory(client, taskId, text, isPinned) {
+function createStory(client, taskId, text, isPinned) {
     try {
-        return await client.stories.createStoryForTask(taskId, {
+        client.stories.createStoryForTask(taskId, {
             text: text,
             is_pinned: isPinned,
         });
@@ -53,7 +53,7 @@ async function createStory(client, taskId, text, isPinned) {
     }
 }
 
-async function createTask(client, name, description, issue, comment, projectId, customFieldId) {
+function createTask(client, name, description, issue, comment, projectId, customFieldId) {
     try {
         client.tasks.createTask({name: name, 
             notes: description, 
@@ -61,7 +61,10 @@ async function createTask(client, name, description, issue, comment, projectId, 
             custom_fields: {[customFieldId]: issue},
             pretty: true})
             .then((result) => {
-                createStory(client, result.gid, comment)
+                client.stories.createStoryForTask(result.gid, {
+                    text: comment,
+                    is_pinned: isPinned,
+                });
             })
     } catch (error) {
         console.error('rejecting promise', error);
@@ -79,14 +82,7 @@ async function createIssueTask(client){
     const TASK_NAME = `Github Issue: ${ISSUE.title}`;
     const TASK_COMMENT = `Link to Issue: ${ISSUE.html_url}`;
 
-    const task = await createTask(client, TASK_NAME, TASK_DESCRIPTION, ISSUE.number, TASK_COMMENT, ASANA_PROJECT_ID, ASANA_CUSTOM_FIELD_ID)
-    
-    if (task === null) {
-        throw new Error('task creation failed');
-    } else {
-        console.info('task created', task);
-    }
-
+    createTask(client, TASK_NAME, TASK_DESCRIPTION, ISSUE.number, TASK_COMMENT, ASANA_PROJECT_ID, ASANA_CUSTOM_FIELD_ID)
 }
 
 async function addPRComment(client){
