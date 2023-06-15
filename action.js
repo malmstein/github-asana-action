@@ -9,31 +9,7 @@ function buildClient(asanaPAT) {
     }).useAccessToken(asanaPAT).authorize();
 }
 
-async function addComment(client, taskId, text, isPinned) {
-    try {
-        return await client.tasks.addComment(taskId, {
-            text: text,
-            is_pinned: isPinned,
-        });
-    } catch (error) {
-        console.error('rejecting promise', error);
-    }
-}
-
-
-function createTask(client, name, description, projectId) {
-    try {
-        return client.tasks.createTask({name: name, 
-            notes: description, 
-            projects: [projectId],
-            pretty: true})
-    } catch (error) {
-        console.error('rejecting promise', error);
-    }
-}
-
-
-async function findAsanaTasks(){
+function findAsanaTasks(){
     const
         TRIGGER_PHRASE = core.getInput('trigger-phrase'),
         PULL_REQUEST = github.context.payload.pull_request,
@@ -54,10 +30,44 @@ async function findAsanaTasks(){
     return foundTasks
 }
 
+
+async function addComment(client, taskId, text, isPinned) {
+    try {
+        return await client.tasks.addComment(taskId, {
+            text: text,
+            is_pinned: isPinned,
+        });
+    } catch (error) {
+        console.error('rejecting promise', error);
+    }
+}
+
+async function createStory(client, taskId, text, isPinned) {
+    try {
+        return await client.stories.createStoryForTask(taskId, {
+            text: text,
+            is_pinned: isPinned,
+        });
+    } catch (error) {
+        console.error('rejecting promise', error);
+    }
+}
+
+function createTask(client, name, description, projectId) {
+    try {
+        return client.tasks.createTask({name: name, 
+            notes: description, 
+            projects: [projectId],
+            pretty: true})
+    } catch (error) {
+        console.error('rejecting promise', error);
+    }
+}
+
 async function createIssueTask(client){
     const ISSUE = github.context.payload.issue;
     const ASANA_PROJECT_ID = core.getInput('asana-project');
-    const isPinned = core.getInput('is-pinned') === 'true';
+    const isPinned = 'true';
 
     console.info('creating asana task from issue', ISSUE.title);
 
@@ -65,16 +75,16 @@ async function createIssueTask(client){
     const TASK_NAME = `Github Issue: ${ISSUE.title}`;
     const TASK_COMMENT = `Issue: ${ISSUE.html_url}`;
 
-    const task = await createTask(client, TASK_NAME, TASK_DESCRIPTION, ASANA_PROJECT_ID)
+    const task = createTask(client, TASK_NAME, TASK_DESCRIPTION, ASANA_PROJECT_ID)
     
     if (task === null) {
         throw new Error('task creation failed');
     } else {
         console.info('task created', task);
+        const TASK_ID = task.gid;
+        createStory(client, TASK_ID, TASK_COMMENT, isPinned);
     }
 
-    const TASK_ID = task.gid
-    addComment(client, TASK_ID, TASK_COMMENT, isPinned)
 }
 
 async function addPRComment(client){
