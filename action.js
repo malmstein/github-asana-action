@@ -25,7 +25,7 @@ function createTask(client, name, description, projectId) {
     try {
         return client.tasks.createTask({name: name, 
             notes: description, 
-            projects: { projectId },
+            projects: [projectId],
             pretty: true})
                 .then((result) => {
                     console.log(result);
