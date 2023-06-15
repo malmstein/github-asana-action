@@ -61,6 +61,7 @@ function createTask(client, name, description, issue, comment, projectId, custom
             custom_fields: {[customFieldId]: issue},
             pretty: true})
             .then((result) => {
+                console.log('task created', result);
                 client.stories.createStoryForTask(result.gid, {
                     text: comment,
                     is_pinned: isPinned,
