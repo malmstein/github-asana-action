@@ -63,10 +63,6 @@ async function createTask(client, name, description, issue, comment, projectId, 
             .then((result) => {
                 console.log('task created', result);
                 return createStory(client, result.gid, comment, true)
-                // return client.stories.createStoryForTask(result.gid, {
-                //     text: comment,
-                //     is_pinned: isPinned,
-                // });
             })
     } catch (error) {
         console.error('rejecting promise', error);
@@ -85,16 +81,6 @@ async function createIssueTask(client){
     const TASK_COMMENT = `Link to Issue: ${ISSUE.html_url}`;
 
     return createTask(client, TASK_NAME, TASK_DESCRIPTION, `${ISSUE.number}`, TASK_COMMENT, ASANA_PROJECT_ID, ASANA_CUSTOM_FIELD_ID)
-
-    // client.tasks.createTask({name: TASK_NAME, 
-    //     notes: TASK_DESCRIPTION, 
-    //     projects: [ASANA_PROJECT_ID],
-    //     custom_fields: {[ASANA_CUSTOM_FIELD_ID]: `${ISSUE.number}`},
-    //     pretty: true})
-    //         .then((result) => {
-    //             console.log('task created', result);
-    //             return createStory(client, result.gid, TASK_COMMENT, true)
-    //         });
 }
 
 async function addPRComment(client){
@@ -148,8 +134,7 @@ async function action() {
 
     switch (ACTION) {
         case 'create-issue-task': {
-            const result = await createIssueTask(client);
-            core.setOutput(result)
+            createIssueTask(client);
             break;
         }
         case 'add-pr-comment': {
