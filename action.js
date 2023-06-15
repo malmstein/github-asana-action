@@ -82,8 +82,7 @@ async function createIssueTask(client){
         throw new Error('task creation failed');
     } else {
         console.info('task created', task);
-        const TASK_ID = task.gid;
-        createStory(client, TASK_ID, TASK_COMMENT, true);
+        createStory(client, task.gid, TASK_COMMENT, true);
     }
 
 }
