@@ -28,6 +28,10 @@ When a Github Issue has been added, it will create an Asana task with the Issue 
 
 **Required** The Asana project ID where the new task will be added i.e ASANA PROJECT: https://app.asana.com/0/1174433894299346
 
+### `asana-custom-field`
+
+**Required** The Asana Custom Field ID that will be used to link the Issue URL. This is needed for the two-way communication between Asana and Github. 
+
 #### Example Usage
 
 ```yaml
@@ -43,6 +47,7 @@ jobs:
         with:
           asana-pat: 'Your PAT'
           asana-project: 'Asana Project Id'
+          asana-custom-field: 'Asana Custom Field Id'
           action: 'create-issue-task'
 ```
 

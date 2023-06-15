@@ -53,11 +53,12 @@ async function createStory(client, taskId, text, isPinned) {
     }
 }
 
-function createTask(client, name, description, projectId) {
+function createTask(client, name, description, issueURL, projectId, customFieldId) {
     try {
         return client.tasks.createTask({name: name, 
             notes: description, 
             projects: [projectId],
+            custom_fields: {[customFieldId]: issueURL},
             pretty: true})
     } catch (error) {
         console.error('rejecting promise', error);
@@ -67,22 +68,22 @@ function createTask(client, name, description, projectId) {
 async function createIssueTask(client){
     const ISSUE = github.context.payload.issue;
     const ASANA_PROJECT_ID = core.getInput('asana-project');
-    const isPinned = 'true';
+    const ASANA_CUSTOM_FIELD_ID = core.getInput('asana-custom-field');
 
     console.info('creating asana task from issue', ISSUE.title);
 
     const TASK_DESCRIPTION = `Description: ${ISSUE.body}`;
     const TASK_NAME = `Github Issue: ${ISSUE.title}`;
-    const TASK_COMMENT = `Issue: ${ISSUE.html_url}`;
+    const TASK_COMMENT = `Link to Issue: ${ISSUE.html_url}`;
 
-    const task = createTask(client, TASK_NAME, TASK_DESCRIPTION, ASANA_PROJECT_ID)
+    const task = createTask(client, TASK_NAME, TASK_DESCRIPTION, ISSUE.html_url, ASANA_PROJECT_ID, ASANA_CUSTOM_FIELD_ID)
     
     if (task === null) {
         throw new Error('task creation failed');
     } else {
         console.info('task created', task);
         const TASK_ID = task.gid;
-        createStory(client, TASK_ID, TASK_COMMENT, isPinned);
+        createStory(client, TASK_ID, TASK_COMMENT, true);
     }
 
 }
