@@ -11,8 +11,8 @@ inputs:
     description: 'Action that will be executed. `create-task` to create a task based on the ISSUE'
     required: true
 branding:
-  icon: 'chevron-right'  
+  icon: 'chevron-right'
   color: 'gray-dark'
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'index.js'
