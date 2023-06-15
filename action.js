@@ -27,10 +27,6 @@ function createTask(client, name, description, projectId) {
             notes: description, 
             projects: [projectId],
             pretty: true})
-                .then((result) => {
-                    console.log(result);
-                    return result
-                });
     } catch (error) {
         console.error('rejecting promise', error);
     }
@@ -70,11 +66,15 @@ async function createIssueTask(client){
     const TASK_COMMENT = `Issue: ${ISSUE.html_url}`;
 
     const task = await createTask(client, TASK_NAME, TASK_DESCRIPTION, ASANA_PROJECT_ID)
+    
     if (task === null) {
         throw new Error('task creation failed');
     } else {
         console.info('task created', task);
     }
+
+    const TASK_ID = task.gid
+    addComment(client, TASK_ID, TASK_COMMENT, isPinned)
 }
 
 async function addPRComment(client){
