@@ -42,9 +42,9 @@ async function addComment(client, taskId, text, isPinned) {
     }
 }
 
-function createStory(client, taskId, text, isPinned) {
+async function createStory(client, taskId, text, isPinned) {
     try {
-        client.stories.createStoryForTask(taskId, {
+        return await client.stories.createStoryForTask(taskId, {
             text: text,
             is_pinned: isPinned,
         });
@@ -90,11 +90,7 @@ async function createIssueTask(client){
         pretty: true})
             .then((result) => {
                 console.log('task created', result);
-                return client.stories.createStoryForTask(result.gid, {
-                    text: TASK_COMMENT,
-                    is_pinned: true,
-                });
-    
+                return createStory(client, result.gid, TASK_COMMENT, true)
             });
 }
 
