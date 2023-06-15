@@ -2,7 +2,7 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const asana = require('asana');
 
-async function buildClient(asanaPAT) {
+function buildClient(asanaPAT) {
     return asana.Client.create({
         defaultHeaders: { 'asana-enable': 'new-sections,string_ids' },
         logAsanaChangeWarnings: false
@@ -21,9 +21,10 @@ async function addComment(client, taskId, text, isPinned) {
 }
 
 
-async function createTask(client, name, description, projectId) {
+function createTask(client, name, description, projectId) {
     try {
-        return await client.tasks.createTask({name: name, 
+        console.log('client', client, client.tasks)
+        return client.tasks.createTask({name: name, 
             notes: description, 
             projects: { projectId },
             pretty: true
