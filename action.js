@@ -55,7 +55,7 @@ async function createStory(client, taskId, text, isPinned) {
 
 async function createTask(client, name, description, issue, projectId, customFieldId) {
     try {
-        return client.tasks.createTask({name: name, 
+        return await client.tasks.createTask({name: name, 
             notes: description, 
             projects: [projectId],
             custom_fields: {[customFieldId]: issue},
