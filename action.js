@@ -61,7 +61,7 @@ async function createTask(client, name, description, issue, comment, projectId, 
             custom_fields: {[customFieldId]: issue},
             pretty: true})
             .then((result) => {
-                console.log('task created', result);
+                console.log('task created', result.gid);
                 return createStory(client, result.gid, comment, true)
             })
     } catch (error) {
@@ -82,6 +82,23 @@ async function createIssueTask(client){
 
     return createTask(client, TASK_NAME, TASK_DESCRIPTION, `${ISSUE.number}`, TASK_COMMENT, ASANA_PROJECT_ID, ASANA_CUSTOM_FIELD_ID)
 }
+
+
+async function notifyPReviewed(client){
+    const 
+        PULL_REQUEST = github.context.payload.pull_request,
+        TASK_COMMENT = `PR: ${PULL_REQUEST.html_url} has been reviewed`;
+
+    const foundTasks = findAsanaTasks()
+
+    const comments = [];
+    for (const taskId of foundTasks) {
+        const comment = addComment(client, taskId, TASK_COMMENT, false)
+        comments.push(comment)
+    }
+    return comments;
+}
+
 
 async function addPRComment(client){
     const 
@@ -135,6 +152,10 @@ async function action() {
     switch (ACTION) {
         case 'create-issue-task': {
             createIssueTask(client);
+            break;
+        }
+        case 'pr-reviewed': {
+            notifyPReviewed(client);
             break;
         }
         case 'add-pr-comment': {
