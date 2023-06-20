@@ -110,9 +110,9 @@ async function addCommentToPRTask(client){
     return comments;
 }
 
-async function userBelongsToOrganization(githubClient) {
+async function userBelongsToOrganization(githubClient, org) {
     githubClient.request('GET /orgs/{org}/members/{username}', {
-        org: 'frakbot',
+        org: org,
         username: user,
         headers: {
           'X-GitHub-Api-Version': '2022-11-28'
@@ -151,15 +151,17 @@ async function pullRequestCreated(client){
     const 
         GITHUB_PAT = core.getInput('github-pat'),
         githubClient = await buildGithubClient(GITHUB_PAT),
-        PULL_REQUEST = github.context.payload.pull_request;
+        PULL_REQUEST = github.context.payload.pull_request,
+        ORG = PULL_REQUEST.data.base.repo.owner.login,
+        REPO = PULL_REQUEST.data.base.repo.name;
 
-    console.info(`PR opened/reopened by ${PULL_REQUEST.data.user.login}, member of DuckDuckGo?`); 
+    console.info(`PR opened/reopened by ${PULL_REQUEST.data.user.login}, member of ${ORG}`); 
 
-    const isMember = await userBelongsToOrganization(githubClient)
+    const isMember = await userBelongsToOrganization(githubClient, ORG)
     if (isMember){
         addCommentToPRTask(client);
     } else {
-        closePR(githubClient, PULL_REQUEST.data.head.repo.owner.login, PULL_REQUEST.data.head.repo.name, PULL_REQUEST.number);
+        closePR(githubClient, ORG, REPO, PULL_REQUEST.number);
     }
 }
 
