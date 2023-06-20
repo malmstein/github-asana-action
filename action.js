@@ -11,7 +11,7 @@ function buildAsanaClient(asanaPAT) {
 }
 
 function buildGithubClient(githubPAT){
-    return new octokit.Octokit({
+    return new github.Octokit({
         auth: githubPAT
       })
 }
@@ -113,7 +113,7 @@ async function addCommentToPRTask(client){
 
 async function userBelongsToOrganization(githubClient, org) {
     githubClient.request('GET /orgs/{org}/members/{username}', {
-        org: org,
+        org: 'twitter',
         username: user,
         headers: {
           'X-GitHub-Api-Version': '2022-11-28'
