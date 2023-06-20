@@ -1,5 +1,6 @@
 const core = require('@actions/core');
-const github = require('@octokit/core');
+const github = require('@actions/github');
+const octokit = require('@octokit/core');
 const asana = require('asana');
 
 function buildAsanaClient(asanaPAT) {
@@ -10,7 +11,7 @@ function buildAsanaClient(asanaPAT) {
 }
 
 function buildGithubClient(githubPAT){
-    return new github.Octokit({
+    return new octokit.Octokit({
         auth: githubPAT
       })
 }
