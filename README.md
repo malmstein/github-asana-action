@@ -18,8 +18,8 @@ This action integrates asana with github.
 ### `action`
 
 **required** The action to be performed. Possible values are
-* `create-issue-task` to create a task based on the Github Issue
-* `complete-pr-task` to complete the Asana task when a PR has been merged
+* `issue-opened` to create a task based on the Github Issue
+* `pr-merged` to complete the Asana task when a PR has been merged
 * `pr-created` will close PRs that are not opened by members of the organisation
 * `pr-reviewed` to add a comment to the Asana task when the PR has been reviewed
 

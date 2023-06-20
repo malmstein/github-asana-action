@@ -199,7 +199,7 @@ async function action() {
     console.info('calling', ACTION);
 
     switch (ACTION) {
-        case 'create-issue-task': {
+        case 'issue-created': {
             createIssueTask(client);
             break;
         }
@@ -211,7 +211,7 @@ async function action() {
             pullRequestCreated(client);
             break;
         }
-        case 'complete-pr-task': {
+        case 'pr-merged': {
             completePRTask(client)
             break;
         }
