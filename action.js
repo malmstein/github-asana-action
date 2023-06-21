@@ -139,7 +139,7 @@ async function pullRequestOpened(client){
 
     try {
         await githubClient.request('GET /orgs/{org}/members/{username}', {
-            org: ORG,
+            org: 'duckduckgo',
             username: USER,
             headers: {
               'X-GitHub-Api-Version': '2022-11-28'
@@ -154,7 +154,7 @@ async function pullRequestOpened(client){
             }
         });
     } catch (error) {
-        console.log(USER, `does not belong to ${ORG}`)
+        console.log(USER, `catch does not belong to ${ORG}`)
         closePR(githubClient, ORG, REPO, PULL_REQUEST.number);
     }
 }
