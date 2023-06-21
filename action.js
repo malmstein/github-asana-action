@@ -113,7 +113,7 @@ async function addCommentToPRTask(client){
 
 async function userBelongsToOrganization(githubClient, org, user) {
     try {
-        githubClient.request('GET /orgs/{org}/members/{username}', {
+        return await githubClient.request('GET /orgs/{org}/members/{username}', {
             org: 'twitter',
             username: user,
             headers: {
@@ -161,7 +161,7 @@ async function pullRequestOpened(client){
 
     console.info(`PR opened/reopened by ${USER}, checking membership in our organization`); 
 
-    const isMember = await userBelongsToOrganization(githubClient, ORG, USER)
+    const isMember = userBelongsToOrganization(githubClient, ORG, USER)
     if (isMember){
         addCommentToPRTask(client);
         core.setOutput('closed', false)
