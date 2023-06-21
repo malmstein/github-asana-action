@@ -123,11 +123,11 @@ async function userBelongsToOrganization(githubClient, org, user) {
     });
 }
 
-async function closePR(githubClient, owner, repo, pull_number){
-    githubClient.request('PATCH /repos/{owner}/{repo}/pulls/{pull_number}', {
+async function closePR(githubClient, owner, repo, issue_number){
+    githubClient.request('PATCH /repos/{owner}/{repo}/pulls/{issue_number}', {
         owner: owner,
         repo: repo,
-        pull_number: pull_number,
+        issue_number: issue_number,
         state: 'closed',
         headers: {
           'X-GitHub-Api-Version': '2022-11-28'
@@ -138,13 +138,13 @@ async function closePR(githubClient, owner, repo, pull_number){
     });
 }
 
-async function pullRequestCreated(client){
+async function pullRequestOpened(client){
     const 
         GITHUB_PAT = core.getInput('github-pat'),
         githubClient = await buildGithubClient(GITHUB_PAT),
         PULL_REQUEST = github.context.payload.pull_request,
         ORG = PULL_REQUEST.base.repo.owner.login,
-        REPO = PULL_REQUEST.base.repo.namem,
+        REPO = PULL_REQUEST.base.repo.name,
         USER = PULL_REQUEST.user.login;
 
     console.info(`PR opened/reopened by ${USER}, checking membership in our organization`); 
@@ -201,7 +201,7 @@ async function action() {
             break;
         }
         case 'pr-opened': {
-            pullRequestCreated(client);
+            pullRequestOpened(client);
             break;
         }
         case 'pr-merged': {
