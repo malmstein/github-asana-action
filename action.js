@@ -149,7 +149,7 @@ async function pullRequestCreated(client){
         ORG = PULL_REQUEST.base.repo.owner.login,
         REPO = PULL_REQUEST.base.repo.name;
 
-    console.info(`PR opened/reopened by ${PULL_REQUEST.data.user.login}, member of ${ORG}`); 
+    console.info(`PR opened/reopened by ${PULL_REQUEST.user.login}, member of ${ORG}`); 
 
     const isMember = await userBelongsToOrganization(githubClient, ORG)
     if (isMember){
