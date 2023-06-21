@@ -146,8 +146,8 @@ async function pullRequestCreated(client){
         GITHUB_PAT = core.getInput('github-pat'),
         githubClient = await buildGithubClient(GITHUB_PAT),
         PULL_REQUEST = github.context.payload.pull_request,
-        ORG = PULL_REQUEST.data.base.repo.owner.login,
-        REPO = PULL_REQUEST.data.base.repo.name;
+        ORG = PULL_REQUEST.base.repo.owner.login,
+        REPO = PULL_REQUEST.base.repo.name;
 
     console.info(`PR opened/reopened by ${PULL_REQUEST.data.user.login}, member of ${ORG}`); 
 
