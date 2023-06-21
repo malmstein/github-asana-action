@@ -169,20 +169,19 @@ async function pullRequestOpened(client){
                 console.log(USER, `belongs to ${ORG}`)
                 core.setOutput('external', false)
             } else {
-                console.log(USER, `does not belong to ${ORG}`)
-                createPullRequestTask(client, PULL_REQUEST)
+                console.log(USER, `does not belong to ${ORG}`)                
                 core.setOutput('external', true)
             }
         });
     } catch (error) {
         console.log(USER, `does not belong to ${ORG}`)
-        createPullRequestTask(client, PULL_REQUEST)
         core.setOutput('external', true)
     }
 }
 
 async function createPullRequestTask(client, PULL_REQUEST){
-    const ASANA_PROJECT_ID = core.getInput('asana-project');
+    const ASANA_PROJECT_ID = core.getInput('asana-project'),
+        PULL_REQUEST = github.context.payload.pull_request;
 
     console.info('creating asana task from pull request', PULL_REQUEST.title);
 
@@ -249,6 +248,10 @@ async function action() {
         }
         case 'add-asana-projects': {
             addTaskToProjects(client);
+            break;
+        }
+        case 'create-asana-pr-task': {
+            createPullRequestTask(client);
             break;
         }
         default:
