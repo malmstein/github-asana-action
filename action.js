@@ -150,7 +150,7 @@ async function closePR(githubClient, owner, repo, issue_number){
 async function pullRequestOpened(client){
     const 
         GITHUB_PAT = core.getInput('github-pat'),
-        githubClient = await buildGithubClient(GITHUB_PAT),
+        githubClient = buildGithubClient(GITHUB_PAT),
         PULL_REQUEST = github.context.payload.pull_request,
         ORG = PULL_REQUEST.base.repo.owner.login,
         USER = PULL_REQUEST.user.login;
