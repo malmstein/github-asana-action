@@ -162,7 +162,7 @@ async function pullRequestOpened(client){
     console.info(`PR opened/reopened by ${USER}, checking membership in our organization`); 
 
     try {
-        githubClient.request('GET /orgs/{org}/members/{username}', {
+        await githubClient.request('GET /orgs/{org}/members/{username}', {
             org: 'twitter',
             username: USER,
             headers: {
