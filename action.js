@@ -112,15 +112,27 @@ async function addCommentToPRTask(client){
 }
 
 async function userBelongsToOrganization(githubClient, org, user) {
-    githubClient.request('GET /orgs/{org}/members/{username}', {
-        org: 'twitter',
-        username: user,
-        headers: {
-          'X-GitHub-Api-Version': '2022-11-28'
-        }
-    }).then((response) => {
-        return (response.status === 204)
-    });
+    try {
+        githubClient.request('GET /orgs/{org}/members/{username}', {
+            org: 'twitter',
+            username: user,
+            headers: {
+              'X-GitHub-Api-Version': '2022-11-28'
+            }
+        }).then((response) => {
+            if (response.status === 204){
+                console.log(user, `belongs to ${org}`)
+                return true
+            } else {
+                console.log(user, `does not belong to ${org}`)
+                return false
+            }
+        });
+    } catch (error) {
+        console.log(user, `does not belong to ${org}`)
+        return false
+    }
+
 }
 
 async function closePR(githubClient, owner, repo, issue_number){
