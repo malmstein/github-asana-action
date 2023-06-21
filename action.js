@@ -161,11 +161,25 @@ async function pullRequestOpened(client){
 
     console.info(`PR opened/reopened by ${USER}, checking membership in our organization`); 
 
-    const isMember = userBelongsToOrganization(githubClient, ORG, USER)
-    if (isMember){
-        addCommentToPRTask(client);
-        core.setOutput('closed', false)
-    } else {
+    try {
+        githubClient.request('GET /orgs/{org}/members/{username}', {
+            org: 'twitter',
+            username: user,
+            headers: {
+              'X-GitHub-Api-Version': '2022-11-28'
+            }
+        }).then((response) => {
+            if (response.status === 204){
+                console.log(user, `belongs to ${org}`)
+                addCommentToPRTask(client);
+                core.setOutput('closed', false)
+            } else {
+                console.log(user, `does not belong to ${org}`)
+                closePR(githubClient, ORG, REPO, PULL_REQUEST.number);
+            }
+        });
+    } catch (error) {
+        console.log(user, `does not belong to ${org}`)
         closePR(githubClient, ORG, REPO, PULL_REQUEST.number);
     }
 }
