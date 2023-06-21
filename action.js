@@ -134,17 +134,7 @@ async function closePR(githubClient, owner, repo, pull_number){
         }
     }).then((response) => {
         console.log(`Pull Request ${pull_number} has been closed`)
-        githubClient.request('POST /repos/{owner}/{repo}/issues/{issue_number}/comments', {
-            owner:'duckduckgo',
-            repo: repo,
-            issue_number: pull_number,
-            body: `At the moment we don't accept Community PRs`,
-            headers: {
-              'X-GitHub-Api-Version': '2022-11-28'
-            }
-        }).then((response) => {
-            core.setOutput('closed', true)
-        }); 
+        core.setOutput('closed', true)
     });
 }
 
@@ -161,6 +151,7 @@ async function pullRequestCreated(client){
     const isMember = await userBelongsToOrganization(githubClient, ORG)
     if (isMember){
         addCommentToPRTask(client);
+        core.setOutput('closed', false)
     } else {
         closePR(githubClient, ORG, REPO, PULL_REQUEST.number);
     }
