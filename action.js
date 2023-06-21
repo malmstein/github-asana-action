@@ -139,7 +139,7 @@ async function pullRequestOpened(client){
 
     try {
         await githubClient.request('GET /orgs/{org}/members/{username}', {
-            org: 'twitter',
+            org: ORG,
             username: USER,
             headers: {
               'X-GitHub-Api-Version': '2022-11-28'
