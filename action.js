@@ -164,22 +164,22 @@ async function pullRequestOpened(client){
     try {
         githubClient.request('GET /orgs/{org}/members/{username}', {
             org: 'twitter',
-            username: user,
+            username: USER,
             headers: {
               'X-GitHub-Api-Version': '2022-11-28'
             }
         }).then((response) => {
             if (response.status === 204){
-                console.log(user, `belongs to ${org}`)
+                console.log(USER, `belongs to ${ORG}`)
                 addCommentToPRTask(client);
                 core.setOutput('closed', false)
             } else {
-                console.log(user, `does not belong to ${org}`)
+                console.log(USER, `does not belong to ${ORG}`)
                 closePR(githubClient, ORG, REPO, PULL_REQUEST.number);
             }
         });
     } catch (error) {
-        console.log(user, `does not belong to ${org}`)
+        console.log(USER, `does not belong to ${ORG}`)
         closePR(githubClient, ORG, REPO, PULL_REQUEST.number);
     }
 }
