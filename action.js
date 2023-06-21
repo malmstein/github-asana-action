@@ -11,7 +11,7 @@ function buildAsanaClient(asanaPAT) {
 }
 
 function buildGithubClient(githubPAT){
-    return new github.Octokit({
+    return new octokit.Octokit({
         auth: githubPAT
       })
 }
