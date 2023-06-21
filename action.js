@@ -161,7 +161,7 @@ async function pullRequestOpened(client){
 
     try {
         await githubClient.request('GET /orgs/{org}/members/{username}', {
-            org: 'twitter',
+            org: 'duckduckgo',
             username: USER,
             headers: {
               'X-GitHub-Api-Version': '2022-11-28'
@@ -187,7 +187,7 @@ async function createPullRequestTask(client, PULL_REQUEST){
     const ASANA_PROJECT_ID = core.getInput('asana-project');
     const ASANA_CUSTOM_FIELD_ID = core.getInput('asana-custom-field');
 
-    console.info('creating asana task from pull request', ISSUE.title);
+    console.info('creating asana task from pull request', PULL_REQUEST.title);
 
     const TASK_DESCRIPTION = `Description: ${PULL_REQUEST.body}`;
     const TASK_NAME = `Github Pull Request: ${PULL_REQUEST.title}`;
