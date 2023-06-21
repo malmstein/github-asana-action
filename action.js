@@ -159,7 +159,7 @@ async function pullRequestOpened(client){
 
     try {
         await githubClient.request('GET /orgs/{org}/members/{username}', {
-            org: 'duckduckgo',
+            org: 'twitter',
             username: USER,
             headers: {
               'X-GitHub-Api-Version': '2022-11-28'
@@ -175,7 +175,7 @@ async function pullRequestOpened(client){
             }
         });
     } catch (error) {
-        console.log(USER, `catch does not belong to ${ORG}`)
+        console.log(USER, `does not belong to ${ORG}`)
         createPullRequestTask(client, PULL_REQUEST)
         core.setOutput('external', true)
     }
