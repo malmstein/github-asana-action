@@ -147,7 +147,6 @@ async function pullRequestOpened(client){
         }).then((response) => {
             if (response.status === 204){
                 console.log(USER, `belongs to ${ORG}`)
-                addCommentToPRTask(client);
                 core.setOutput('closed', false)
             } else {
                 console.log(USER, `does not belong to ${ORG}`)
@@ -208,6 +207,10 @@ async function action() {
         }
         case 'pr-merged': {
             completePRTask(client)
+            break;
+        }
+        case 'add-asana-comment': {
+            addCommentToPRTask(client);
             break;
         }
         default:
