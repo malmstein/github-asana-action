@@ -111,7 +111,7 @@ async function addCommentToPRTask(client){
     return comments;
 }
 
-async function userBelongsToOrganization(githubClient, org) {
+async function userBelongsToOrganization(githubClient, org, user) {
     githubClient.request('GET /orgs/{org}/members/{username}', {
         org: 'twitter',
         username: user,
@@ -139,19 +139,17 @@ async function closePR(githubClient, owner, repo, pull_number){
 }
 
 async function pullRequestCreated(client){
-
-    console.info('pr created', github.context.payload.pull_request);
-
     const 
         GITHUB_PAT = core.getInput('github-pat'),
         githubClient = await buildGithubClient(GITHUB_PAT),
         PULL_REQUEST = github.context.payload.pull_request,
         ORG = PULL_REQUEST.base.repo.owner.login,
-        REPO = PULL_REQUEST.base.repo.name;
+        REPO = PULL_REQUEST.base.repo.namem,
+        USER = PULL_REQUEST.user.login;
 
-    console.info(`PR opened/reopened by ${PULL_REQUEST.user.login}, member of ${ORG}`); 
+    console.info(`PR opened/reopened by ${USER}, checking membership in our organization`); 
 
-    const isMember = await userBelongsToOrganization(githubClient, ORG)
+    const isMember = await userBelongsToOrganization(githubClient, ORG, USER)
     if (isMember){
         addCommentToPRTask(client);
         core.setOutput('closed', false)
