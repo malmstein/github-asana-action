@@ -94,6 +94,29 @@ async function notifyPReviewed(client){
     return comments;
 }
 
+async function addTaskToProject(client, taskId, projectId, sectionId) {
+    try {
+        return await client.stories.createStoryForTask(taskId, {
+            text: text,
+            is_pinned: isPinned,
+        });
+    } catch (error) {
+        console.error('rejecting promise', error);
+    }
+}
+
+async function addTaskToProjects(client){
+    const inputProjects = core.getInput('asana-projects');
+    const inputSections = core.getInput('asana-sections');
+
+    if (!inputProjects) return;
+
+    const projects = projects.split("\n").map((gid) => `${gid}`);
+    for (const projectId of projects) {
+        addTaskToProject(client, projectId)
+    }
+}
+
 
 async function addCommentToPRTask(client){
     const 
@@ -132,14 +155,13 @@ async function pullRequestOpened(client){
         githubClient = await buildGithubClient(GITHUB_PAT),
         PULL_REQUEST = github.context.payload.pull_request,
         ORG = PULL_REQUEST.base.repo.owner.login,
-        REPO = PULL_REQUEST.base.repo.name,
         USER = PULL_REQUEST.user.login;
 
     console.info(`PR opened/reopened by ${USER}, checking membership in our organization`); 
 
     try {
         await githubClient.request('GET /orgs/{org}/members/{username}', {
-            org: 'duckduckgo',
+            org: 'twitter',
             username: USER,
             headers: {
               'X-GitHub-Api-Version': '2022-11-28'
@@ -150,13 +172,28 @@ async function pullRequestOpened(client){
                 core.setOutput('closed', false)
             } else {
                 console.log(USER, `does not belong to ${ORG}`)
-                closePR(githubClient, ORG, REPO, PULL_REQUEST.number);
+                createPullRequestTask(client, PULL_REQUEST)
+                core.setOutput('closed', true)
             }
         });
     } catch (error) {
         console.log(USER, `catch does not belong to ${ORG}`)
-        closePR(githubClient, ORG, REPO, PULL_REQUEST.number);
+        createPullRequestTask(client, PULL_REQUEST)
+        core.setOutput('closed', true)
     }
+}
+
+async function createPullRequestTask(client, PULL_REQUEST){
+    const ASANA_PROJECT_ID = core.getInput('asana-project');
+    const ASANA_CUSTOM_FIELD_ID = core.getInput('asana-custom-field');
+
+    console.info('creating asana task from pull request', ISSUE.title);
+
+    const TASK_DESCRIPTION = `Description: ${PULL_REQUEST.body}`;
+    const TASK_NAME = `Github Pull Request: ${PULL_REQUEST.title}`;
+    const TASK_COMMENT = `Link to Pull Request: ${PULL_REQUEST.html_url}`;
+
+    return createTask(client, TASK_NAME, TASK_DESCRIPTION, `${ISSUE.number}`, TASK_COMMENT, ASANA_PROJECT_ID, ASANA_CUSTOM_FIELD_ID)
 }
 
 async function completePRTask(client){
@@ -211,6 +248,10 @@ async function action() {
         }
         case 'add-asana-comment': {
             addCommentToPRTask(client);
+            break;
+        }
+        case 'add-asana-projects': {
+            addTaskToProjects(client);
             break;
         }
         default:
