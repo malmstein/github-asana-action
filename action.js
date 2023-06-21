@@ -113,7 +113,7 @@ async function addCommentToPRTask(client){
 
 async function userBelongsToOrganization(githubClient, org, user) {
     try {
-        return await githubClient.request('GET /orgs/{org}/members/{username}', {
+        await githubClient.request('GET /orgs/{org}/members/{username}', {
             org: 'twitter',
             username: user,
             headers: {
