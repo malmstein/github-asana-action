@@ -139,6 +139,9 @@ async function closePR(githubClient, owner, repo, pull_number){
 }
 
 async function pullRequestCreated(client){
+
+    console.info('pr created', github.context.payload.pull_request);
+
     const 
         GITHUB_PAT = core.getInput('github-pat'),
         githubClient = await buildGithubClient(GITHUB_PAT),
