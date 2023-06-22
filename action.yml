@@ -1,6 +1,9 @@
 name: 'Asana Github Issues Integration'
-description: 'Create Asana task based on a Github Issue'
+description: 'Common integrations between Asana and Github'
 inputs:
+  github-pat:
+    description: 'Github Public Access Token.'
+    required: true
   asana-pat:
     description: 'Asana Public Access Token.'
     required: true
