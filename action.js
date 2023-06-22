@@ -179,7 +179,7 @@ async function pullRequestOpened(client){
     }
 }
 
-async function createPullRequestTask(client, PULL_REQUEST){
+async function createPullRequestTask(client){
     const 
         ASANA_PROJECT_ID = core.getInput('asana-project'),
         PULL_REQUEST = github.context.payload.pull_request;
