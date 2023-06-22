@@ -1,15 +1,15 @@
-name: 'Asana Github Issues Integration'
-description: 'Common integrations between Asana and Github'
+name: 'Github -> Asana Integrations'
+description: 'Common integrations between Github and Asana'
 inputs:
   action:
     description: 'Action that will be executed. `create-task` to create a task based on the ISSUE'
     required: true
   github-pat:
     description: 'Github Public Access Token.'
-    required: true
+    required: false
   asana-pat:
     description: 'Asana Public Access Token.'
-    required: true
+    required: false
   asana-project:
     description: 'Asana Project Id where the Task will be added.'
     required: false

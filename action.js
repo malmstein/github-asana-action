@@ -97,7 +97,7 @@ async function notifyPReviewed(){
 
 async function addTaskToAsanaProject(){
     const client = await buildAsanaClient();
-    
+
     const projectId = core.getInput('asana-project', {required: true});
     const sectionId = core.getInput('asana-section');
 
@@ -228,7 +228,7 @@ async function action() {
     console.info('calling', ACTION);
 
     switch (ACTION) {
-        case 'notify-issue-opened': {
+        case 'create-asana-issue-task': {
             createIssueTask();
             break;
         }
