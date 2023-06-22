@@ -13,7 +13,7 @@ inputs:
   asana-project:
     description: 'Asana Project Id where the Task will be added.'
     required: false
-    asana-section:
+  asana-section:
     description: 'The Section of the Project where the Task will be added to'
     required: false
   trigger-phrase:
