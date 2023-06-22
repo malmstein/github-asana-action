@@ -155,21 +155,6 @@ async function addCommentToPRTask(){
     return comments;
 }
 
-async function closePR(githubClient, owner, repo, issue_number){
-    githubClient.request('PATCH /repos/{owner}/{repo}/pulls/{issue_number}', {
-        owner: owner,
-        repo: repo,
-        issue_number: issue_number,
-        state: 'closed',
-        headers: {
-          'X-GitHub-Api-Version': '2022-11-28'
-        }
-    }).then((response) => {
-        console.log(`Pull Request ${issue_number} has been closed`)
-        core.setOutput('closed', true)
-    });
-}
-
 async function createPullRequestTask(){
     const 
         ASANA_PROJECT_ID = core.getInput('asana-project'),
