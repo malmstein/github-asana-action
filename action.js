@@ -109,7 +109,7 @@ async function addTaskToAsanaProject(){
 }
 
 async function addTaskToProject(client, taskId, projectId, sectionId){
-    if (sectionId === 0){
+    if (sectionId == 0){
         console.info('adding asana task to project', projectId);
         try {
             return await client.tasks.addProjectForTask(taskId, {
