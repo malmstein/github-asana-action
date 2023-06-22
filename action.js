@@ -199,7 +199,7 @@ async function createPullRequestTask(){
     console.info('creating asana task from pull request', PULL_REQUEST.title);
 
     const TASK_DESCRIPTION = `Description: ${PULL_REQUEST.body}`;
-    const TASK_NAME = `Github Pull Request: ${PULL_REQUEST.title}`;
+    const TASK_NAME = `Community Pull Request: ${PULL_REQUEST.title}`;
     const TASK_COMMENT = `Link to Pull Request: ${PULL_REQUEST.html_url}`;
 
     return createTask(client, TASK_NAME, TASK_DESCRIPTION, TASK_COMMENT, ASANA_PROJECT_ID)
