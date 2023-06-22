@@ -98,7 +98,7 @@ async function notifyPReviewed(){
 async function addTaskToAsanaProject(){
     const client = await buildAsanaClient();
     const projectId = core.getInput('asana-project');
-    const sectionId = core.getInput('asana-section') === '0';
+    const sectionId = core.getInput('asana-section');
 
     if (!projectId) return;
 
@@ -109,7 +109,7 @@ async function addTaskToAsanaProject(){
 }
 
 async function addTaskToProject(client, taskId, projectId, sectionId){
-    if (sectionId == '0'){
+    if (!sectionId){
         console.info('adding asana task to project', projectId);
         try {
             return await client.tasks.addProjectForTask(taskId, {
