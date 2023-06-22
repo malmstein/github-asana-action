@@ -180,7 +180,8 @@ async function pullRequestOpened(client){
 }
 
 async function createPullRequestTask(client, PULL_REQUEST){
-    const ASANA_PROJECT_ID = core.getInput('asana-project'),
+    const 
+        ASANA_PROJECT_ID = core.getInput('asana-project'),
         PULL_REQUEST = github.context.payload.pull_request;
 
     console.info('creating asana task from pull request', PULL_REQUEST.title);
@@ -212,6 +213,38 @@ async function completePRTask(client){
     return taskIds;
 }
 
+async function checkPRMembership(){
+    const 
+        GITHUB_PAT = core.getInput('github-pat'),
+        githubClient = buildGithubClient(GITHUB_PAT),
+        PULL_REQUEST = github.context.payload.pull_request,
+        ORG = PULL_REQUEST.base.repo.owner.login,
+        USER = PULL_REQUEST.user.login;
+
+        console.info(`PR opened/reopened by ${USER}, checking membership in our organization`); 
+
+    try {
+        await githubClient.request('GET /orgs/{org}/members/{username}', {
+            org: 'twitter',
+            username: USER,
+            headers: {
+            'X-GitHub-Api-Version': '2022-11-28'
+            }
+        }).then((response) => {
+            if (response.status === 204){
+                console.log(USER, `belongs to ${ORG}`)
+                core.setOutput('external', false)
+            } else {
+                console.log(USER, `does not belong to ${ORG}`)                
+                core.setOutput('external', true)
+            }
+        });
+    } catch (error) {
+        console.log(USER, `does not belong to ${ORG}`)
+        core.setOutput('external', true)
+    }
+}
+
 async function action() {
     const
         ASANA_PAT = core.getInput('asana-pat'),
@@ -226,20 +259,24 @@ async function action() {
     console.info('calling', ACTION);
 
     switch (ACTION) {
-        case 'issue-opened': {
+        case 'notify-issue-opened': {
             createIssueTask(client);
             break;
         }
-        case 'pr-reviewed': {
+        case 'notify-pr-reviewed': {
             notifyPReviewed(client);
             break;
         }
-        case 'pr-opened': {
+        case 'notify-pr-merged': {
+            completePRTask(client)
+            break;
+        }
+        case 'notify-pr-opened': {
             pullRequestOpened(client);
             break;
         }
-        case 'pr-merged': {
-            completePRTask(client)
+        case 'check-pr-membership': {
+            checkPRMembership(client);
             break;
         }
         case 'add-asana-comment': {
