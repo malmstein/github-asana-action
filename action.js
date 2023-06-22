@@ -3,11 +3,12 @@ const github = require('@actions/github');
 const octokit = require('@octokit/core');
 const asana = require('asana');
 
-function buildAsanaClient(asanaPAT) {
+function buildAsanaClient() {
+    const ASANA_PAT = core.getInput('asana-pat');
     return asana.Client.create({
         defaultHeaders: { 'asana-enable': 'new-sections,string_ids' },
         logAsanaChangeWarnings: false
-    }).useAccessToken(asanaPAT).authorize();
+    }).useAccessToken(ASANA_PAT).authorize();
 }
 
 function buildGithubClient(githubPAT){
@@ -63,7 +64,8 @@ async function createTask(client, name, description, comment, projectId) {
     }
 }
 
-async function createIssueTask(client){
+async function createIssueTask(){
+    const client = await buildAsanaClient();
     const ISSUE = github.context.payload.issue;
     const ASANA_PROJECT_ID = core.getInput('asana-project');
 
@@ -77,7 +79,8 @@ async function createIssueTask(client){
 }
 
 
-async function notifyPReviewed(client){
+async function notifyPReviewed(){
+    const client = await buildAsanaClient();
     const 
         PULL_REQUEST = github.context.payload.pull_request,
         TASK_COMMENT = `PR: ${PULL_REQUEST.html_url} has been reviewed`;
@@ -103,7 +106,10 @@ async function addTaskToProject(client, taskId, projectId, sectionId) {
     }
 }
 
-async function addTaskToProjects(client){
+async function addTaskToProjects(){
+
+    const client = await buildAsanaClient();
+
     const inputProjects = core.getInput('asana-projects');
     const inputSections = core.getInput('asana-sections');
 
@@ -116,11 +122,13 @@ async function addTaskToProjects(client){
 }
 
 
-async function addCommentToPRTask(client){
+async function addCommentToPRTask(){
     const 
         PULL_REQUEST = github.context.payload.pull_request,
         TASK_COMMENT = `PR: ${PULL_REQUEST.html_url}`,
         isPinned = core.getInput('is-pinned') === 'true';
+
+    const client = await buildAsanaClient();
 
     const foundTasks = findAsanaTasks()
 
@@ -147,7 +155,9 @@ async function closePR(githubClient, owner, repo, issue_number){
     });
 }
 
-async function pullRequestOpened(client){
+async function pullRequestOpened(){
+    const client = await buildAsanaClient();
+
     const 
         GITHUB_PAT = core.getInput('github-pat'),
         githubClient = buildGithubClient(GITHUB_PAT),
@@ -179,10 +189,12 @@ async function pullRequestOpened(client){
     }
 }
 
-async function createPullRequestTask(client){
+async function createPullRequestTask(){
     const 
         ASANA_PROJECT_ID = core.getInput('asana-project'),
         PULL_REQUEST = github.context.payload.pull_request;
+
+    const client = await buildAsanaClient();
 
     console.info('creating asana task from pull request', PULL_REQUEST.title);
 
@@ -193,7 +205,8 @@ async function createPullRequestTask(client){
     return createTask(client, TASK_NAME, TASK_DESCRIPTION, TASK_COMMENT, ASANA_PROJECT_ID)
 }
 
-async function completePRTask(client){
+async function completePRTask(){
+    const client = await buildAsanaClient();
     const isComplete = core.getInput('is-complete') === 'true';
 
     const foundTasks = findAsanaTasks()
@@ -246,49 +259,40 @@ async function checkPRMembership(){
 }
 
 async function action() {
-    const
-        ASANA_PAT = core.getInput('asana-pat'),
-        ACTION = core.getInput('action', {required: true});
-
-    const client = await buildAsanaClient(ASANA_PAT);
-
-    if (client === null) {
-        throw new Error('client authorization failed');
-    }
-
+    const ACTION = core.getInput('action', {required: true});
     console.info('calling', ACTION);
 
     switch (ACTION) {
         case 'notify-issue-opened': {
-            createIssueTask(client);
+            createIssueTask();
             break;
         }
         case 'notify-pr-reviewed': {
-            notifyPReviewed(client);
+            notifyPReviewed();
             break;
         }
         case 'notify-pr-merged': {
-            completePRTask(client)
+            completePRTask()
             break;
         }
         case 'notify-pr-opened': {
-            pullRequestOpened(client);
+            pullRequestOpened();
             break;
         }
         case 'check-pr-membership': {
-            checkPRMembership(client);
+            checkPRMembership();
             break;
         }
         case 'add-asana-comment': {
-            addCommentToPRTask(client);
+            addCommentToPRTask();
             break;
         }
         case 'add-asana-projects': {
-            addTaskToProjects(client);
+            addTaskToProjects();
             break;
         }
         case 'create-asana-pr-task': {
-            createPullRequestTask(client);
+            createPullRequestTask();
             break;
         }
         default:
