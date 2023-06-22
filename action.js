@@ -100,7 +100,7 @@ async function addTaskToAsanaProject(){
     const projectId = core.getInput('asana-project');
     const sectionId = core.getInput('asana-section') === '0';
 
-    if (!inputProject) return;
+    if (!projectId) return;
 
     const foundTasks = findAsanaTasks()
     for (const taskId of foundTasks) {
