@@ -238,7 +238,7 @@ async function checkPRMembership(){
 
     try {
         await githubClient.request('GET /orgs/{org}/members/{username}', {
-            org: 'twitter',
+            org: 'duckduckgo',
             username: USER,
             headers: {
             'X-GitHub-Api-Version': '2022-11-28'
