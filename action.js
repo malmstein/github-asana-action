@@ -95,32 +95,47 @@ async function notifyPReviewed(){
     return comments;
 }
 
-async function addTaskToProject(client, taskId, projectId, sectionId) {
-    try {
-        return await client.stories.createStoryForTask(taskId, {
-            text: text,
-            is_pinned: isPinned,
-        });
-    } catch (error) {
-        console.error('rejecting promise', error);
-    }
-}
-
-async function addTaskToProjects(){
-
+async function addTaskToAsanaProject(){
     const client = await buildAsanaClient();
+    const projectId = core.getInput('asana-project');
+    const sectionId = core.getInput('asana-section') === '0';
 
-    const inputProjects = core.getInput('asana-projects');
-    const inputSections = core.getInput('asana-sections');
+    if (!inputProject) return;
 
-    if (!inputProjects) return;
-
-    const projects = projects.split("\n").map((gid) => `${gid}`);
-    for (const projectId of projects) {
-        addTaskToProject(client, projectId)
+    const foundTasks = findAsanaTasks()
+    for (const taskId of foundTasks) {
+        addTaskToProject(client, taskId, projectId, sectionId)        
     }
 }
 
+async function addTaskToProject(client, taskId, projectId, sectionId){
+    if (sectionId === 0){
+        console.info('adding asana task to project', projectId);
+        try {
+            return await client.tasks.addProjectForTask(taskId, {
+                project: projectId,        
+                insert_after: null
+            });
+        } catch (error) {
+            console.error('rejecting promise', error);
+        }
+    } else {
+        console.info(`adding asana task to top of section ${sectionId} in project ${projectId}`);
+        try {
+            return await client.tasks.addProjectForTask(taskId, {
+                project: projectId                
+            })
+            .then((result) => {
+                client.sections.addTaskForSection(sectionId, {task: taskId})
+                .then((result) => {
+                    console.log(result);
+                });
+            });
+        } catch (error) {
+            console.error('rejecting promise', error);
+        }
+    }
+}
 
 async function addCommentToPRTask(){
     const 
@@ -153,40 +168,6 @@ async function closePR(githubClient, owner, repo, issue_number){
         console.log(`Pull Request ${issue_number} has been closed`)
         core.setOutput('closed', true)
     });
-}
-
-async function pullRequestOpened(){
-    const client = await buildAsanaClient();
-
-    const 
-        GITHUB_PAT = core.getInput('github-pat'),
-        githubClient = buildGithubClient(GITHUB_PAT),
-        PULL_REQUEST = github.context.payload.pull_request,
-        ORG = PULL_REQUEST.base.repo.owner.login,
-        USER = PULL_REQUEST.user.login;
-
-    console.info(`PR opened/reopened by ${USER}, checking membership in our organization`); 
-
-    try {
-        await githubClient.request('GET /orgs/{org}/members/{username}', {
-            org: 'twitter',
-            username: USER,
-            headers: {
-              'X-GitHub-Api-Version': '2022-11-28'
-            }
-        }).then((response) => {
-            if (response.status === 204){
-                console.log(USER, `belongs to ${ORG}`)
-                core.setOutput('external', false)
-            } else {
-                console.log(USER, `does not belong to ${ORG}`)                
-                core.setOutput('external', true)
-            }
-        });
-    } catch (error) {
-        console.log(USER, `does not belong to ${ORG}`)
-        core.setOutput('external', true)
-    }
 }
 
 async function createPullRequestTask(){
@@ -275,10 +256,6 @@ async function action() {
             completePRTask()
             break;
         }
-        case 'notify-pr-opened': {
-            pullRequestOpened();
-            break;
-        }
         case 'check-pr-membership': {
             checkPRMembership();
             break;
@@ -287,8 +264,8 @@ async function action() {
             addCommentToPRTask();
             break;
         }
-        case 'add-asana-projects': {
-            addTaskToProjects();
+        case 'add-task-asana-project': {
+            addTaskToAsanaProject();
             break;
         }
         case 'create-asana-pr-task': {
