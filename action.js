@@ -67,7 +67,7 @@ async function createTask(client, name, description, comment, projectId) {
 async function createIssueTask(){
     const client = await buildAsanaClient();
     const ISSUE = github.context.payload.issue;
-    const ASANA_PROJECT_ID = core.getInput('asana-project');
+    const ASANA_PROJECT_ID = core.getInput('asana-project', {required: true});
 
     console.info('creating asana task from issue', ISSUE.title);
 

@@ -32,10 +32,6 @@ When a Github Issue has been added, it will create an Asana task with the Issue 
 
 **Required** The Asana project ID where the new task will be added i.e ASANA PROJECT: https://app.asana.com/0/1174433894299346
 
-### `asana-custom-field`
-
-**Required** The Asana Custom Field ID that will be used to link the Issue URL. This is needed for the two-way communication between Asana and Github. 
-
 #### Example Usage
 
 ```yaml
@@ -47,13 +43,37 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: malmstein/github-asana-action@v0.4.0
+      - uses: malmstein/github-asana-action@v0.6.0
         with:
           asana-pat: 'Your PAT'
           asana-project: 'Asana Project Id'
-          asana-custom-field: 'Asana Custom Field Id'
-          action: 'create-issue-task'
+          action: 'create-asana-issue-task'
 ```
+### Comment on Asana task when PR has been reviewed
+When a Pull Request has been reviewed, it will look for an Asana task in the PR description and comment on it.
+### `trigger-phrase`
+
+**Required** Prefix before the task i.e ASANA TASK: https://app.asana.com/1/2/3/.
+
+#### Example Usage
+
+```yaml
+on:
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  pr-reviewed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update Asana task -> PR reviewed
+        uses: malmstein/github-asana-action@0.6.0
+        with:
+          asana-pat: 'Your PAT'
+          trigger-phrase: 'Your Trigger Phrase'
+          action: 'notify-pr-reviewed'
+```
+
 ### Complete Asana task when Github PR merged
 When a Github Pull Request has been closed, it will look for an Asana task in the PR description and close it.
 ### `is-complete`
@@ -66,25 +86,52 @@ on:
     types: [closed]
 
 jobs:
-  sync:
+  add-pr-merged-comment:
     runs-on: ubuntu-latest
     steps:
-      - uses: malmstein/github-asana-action@v0.4.0
+      - uses: malmstein/github-asana-action@master
+        if: github.event.pull_request.merged
         with:
           asana-pat: 'Your PAT'
-          trigger-phrase: 'Asana Task:'
-          action: 'complete-pr-task'
+          trigger-phrase: 'Your Trigger Phrase'
+          action: 'notify-pr-merged'
           is-complete: true
 ```
 
-### Close PRs when opened by users that are not members of the organisation
-When a Github Pull Request has been opened, it will check if the sender is a member of the organisation. If they aren't, then the PR will be closed and a template reply will be added. If the user is part of the organisationm, it will look for an Asana task in the PR description and comment there the PR link.
-### `trigger-phrase`
-
+### Check membership of the PR author in the repo organisation
+When a Github Pull Request has been opened, it will check if the sender is a member of the organisation.
+This is one of the step of a bigger workflow, that process PRs differently depending if it's a community PR or not.
 **Required** Prefix before the task i.e ASANA TASK: https://app.asana.com/1/2/3/.
 ### `github-pat`
 
 **Required** Github public access token
+#### Example Usage
+
+```yaml
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  validate-pr:
+    name: Validate Pull Request
+    runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.step1.outputs.external }}
+    steps:
+      - name: Checking Pull Request sender membership
+        id: step1
+        uses: malmstein/github-asana-action@0.6.0
+        with:
+          github-pat: 'Your Github PAT'
+          action: 'check-pr-membership'
+```
+
+### Comment on Asana task when PR has been opened
+For PRs that are opened by members of the organisation, it will look for an Asana task in the PR description and comment on it with the PR link.
+### `trigger-phrase`
+**Required** Prefix before the task i.e ASANA TASK: https://app.asana.com/1/2/3/.
+
 ### `is-pinned`
 **optional** Pinned the PR comment when set to `true`
 
@@ -103,16 +150,62 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: malmstein/github-asana-action@v0.4.0
+      - name: Add comment in Asana task
+        uses: malmstein/github-asana-action@0.6.0
         with:
           asana-pat: 'Your PAT'
-          trigger-phrase: 'Asana Task:'
-          action: 'add-pr-comment'
-          is-pinned: true
+          trigger-phrase: 'Your Trigger Phrase'
+          action: 'add-asana-comment'
 ```
 
-### Comment on Asana task when PR has been reviewed
-When a Pull Request has been reviewed, it will look for an Asana task in the PR description and comment on it.
+### Add task to an Asana project
+Adds a task to an Asana project and section. The action will look for an Asana task in the PR description.
 ### `trigger-phrase`
-
 **Required** Prefix before the task i.e ASANA TASK: https://app.asana.com/1/2/3/.
+### `asana-project`
+**Required** Id of the Asana project that the task will be added to. Task will be added to the top of the project.
+### `asana-section`
+**optional** Id of the Asana section in the Asana project. Task will be added to the top of the section.
+
+#### Example Usage
+```yaml
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add Asana task to Project
+        uses: malmstein/github-asana-action@0.6.0
+        with:
+          trigger-phrase: 'Your Trigger Phrase'
+          asana-project: 'Asana Project Id'
+          asana-section: 'Asana Section Id'
+          action: 'add-task-asana-project'
+```
+
+### Create Asana task from Github Pull Request
+When a Github Pull Request has been added by a community contributor, it will create an Asana task with the Pull Request title, description and link.
+### `asana-project`
+
+**Required** The Asana project ID where the new task will be added i.e ASANA PROJECT: https://app.asana.com/0/1174433894299346
+
+#### Example Usage
+
+```yaml
+on:
+  issues:
+    types: [opened, reopened]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Asana task in Asana Project
+        uses: malmstein/github-asana-action@0.6.0
+        with:          
+          asana-project: 'Asana Project Id'
+          action: 'create-asana-pr-task'
+```
