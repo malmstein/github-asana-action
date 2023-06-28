@@ -19,7 +19,7 @@ This action integrates asana with github.
 
 **required** The action to be performed. Possible values are
 * `create-asana-issue-task` to create a task based on the Github Issue
-* `notify-pr-reviewed` to add a comment to the Asana task when the PR has been reviewed
+* `notify-pr-approved` to add a comment to the Asana task when the PR has been approved
 * `notify-pr-merged` to complete the Asana task when a PR has been merged
 * `check-pr-membership` checks the PR sender membership in the organisation that owns the repo
 * `add-asana-comment` adds a comment to the Asana task with the link to the Pull Request
@@ -43,7 +43,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: malmstein/github-asana-action@v0.6.0
+      - uses: malmstein/github-asana-action@v0.7.0
         with:
           asana-pat: 'Your PAT'
           asana-project: 'Asana Project Id'
@@ -66,12 +66,12 @@ jobs:
   pr-reviewed:
     runs-on: ubuntu-latest
     steps:
-      - name: Update Asana task -> PR reviewed
-        uses: malmstein/github-asana-action@0.6.0
+      - name: Update Asana task -> PR approved
+        uses: malmstein/github-asana-action@0.7.0
         with:
           asana-pat: 'Your PAT'
           trigger-phrase: 'Your Trigger Phrase'
-          action: 'notify-pr-reviewed'
+          action: 'notify-pr-approved'
 ```
 
 ### Complete Asana task when Github PR merged
@@ -89,7 +89,7 @@ jobs:
   add-pr-merged-comment:
     runs-on: ubuntu-latest
     steps:
-      - uses: malmstein/github-asana-action@master
+      - uses: malmstein/github-asana-action@0.7.0
         if: github.event.pull_request.merged
         with:
           asana-pat: 'Your PAT'
@@ -121,7 +121,7 @@ jobs:
     steps:
       - name: Checking Pull Request sender membership
         id: step1
-        uses: malmstein/github-asana-action@0.6.0
+        uses: malmstein/github-asana-action@0.7.0
         with:
           github-pat: 'Your Github PAT'
           action: 'check-pr-membership'
@@ -151,7 +151,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add comment in Asana task
-        uses: malmstein/github-asana-action@0.6.0
+        uses: malmstein/github-asana-action@0.7.0
         with:
           asana-pat: 'Your PAT'
           trigger-phrase: 'Your Trigger Phrase'
@@ -178,7 +178,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add Asana task to Project
-        uses: malmstein/github-asana-action@0.6.0
+        uses: malmstein/github-asana-action@0.7.0
         with:
           trigger-phrase: 'Your Trigger Phrase'
           asana-project: 'Asana Project Id'
@@ -204,7 +204,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create Asana task in Asana Project
-        uses: malmstein/github-asana-action@0.6.0
+        uses: malmstein/github-asana-action@0.7.0
         with:          
           asana-project: 'Asana Project Id'
           action: 'create-asana-pr-task'

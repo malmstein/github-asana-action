@@ -79,11 +79,11 @@ async function createIssueTask(){
 }
 
 
-async function notifyPReviewed(){
+async function notifyPRApproved(){
     const client = await buildAsanaClient();
     const 
         PULL_REQUEST = github.context.payload.pull_request,
-        TASK_COMMENT = `PR: ${PULL_REQUEST.html_url} has been reviewed`;
+        TASK_COMMENT = `PR: ${PULL_REQUEST.html_url} has been approved`;
 
     const foundTasks = findAsanaTasks()
 
@@ -232,8 +232,8 @@ async function action() {
             createIssueTask();
             break;
         }
-        case 'notify-pr-reviewed': {
-            notifyPReviewed();
+        case 'notify-pr-approved': {
+            notifyPRApproved();
             break;
         }
         case 'notify-pr-merged': {
