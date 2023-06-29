@@ -24,8 +24,9 @@ This action integrates asana with github.
 * `check-pr-membership` checks the PR sender membership in the organisation that owns the repo
 * `add-asana-comment` adds a comment to the Asana task with the link to the Pull Request
 * `add-task-asana-project` adds a task to a project / section in Asana
-* `create-asana-pr-task` to create a task based on the Github Pull RequestAsana
+* `create-asana-pr-task` to create a task in Asana based on the Github Pull Request 
 * `get-latest-repo-release` to find the latest release version of a Github Repository
+* `create-asana-task` to create a task in Asana 
 
 ### Create Asana task from Github Issue
 When a Github Issue has been added, it will create an Asana task with the Issue title, description and link.
@@ -240,4 +241,38 @@ jobs:
           github-repository: 'Github Repository'
           github-org: 'Github Organisation'
           action: 'get-latest-repo-release'
+```
+
+
+### Create Asana task
+Creates an Asana task with the properties defined below.
+
+### `asana-project`
+**Required** The Asana project ID where the new task will be added i.e ASANA PROJECT: https://app.asana.com/0/1174433894299346
+### `asana-section`
+The Asana section ID in the Asana Project
+### `asana-task-name`
+**Required** Name of the Asana task
+### `asana-task-description`
+**Required** Description of the Asana task
+
+#### Example Usage
+
+```yaml
+on:
+  issues:
+    types: [opened, reopened]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Asana task in Asana Project
+        uses: malmstein/github-asana-action@0.7.0
+        with:          
+          asana-project: 'Asana Project Id'
+          asana-section: 'Asana Section Id'
+          asana-task-name: 'Asana Task Name'
+          asana-task-description: 'Asana Task Description'
+          action: 'create-asana-task'
 ```

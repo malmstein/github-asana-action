@@ -249,6 +249,39 @@ async function getLatestRepositoryRelease(){
 
 }
 
+async function createAsanaTask(){
+    const 
+        projectId = core.getInput('asana-project', {required: true}),
+        sectionId = core.getInput('asana-section'),
+        taskName = core.getInput('asana-task-name', {required: true}),
+        taskDescription = core.getInput('asana-task-description', {required: true});
+
+    const client = await buildAsanaClient();
+        
+    if (!sectionId){
+        console.info('creating asana task', projectId);
+        try {
+            await client.tasks.create({            
+                projects: [projectId],
+                memberships: [{project: projectId, section: sectionId}],
+                name: taskName,
+                notes: taskDescription,
+
+            }).then((response) => {
+                const taskId = response.data.gid
+                console.log(`task created with id ${taskId}`)
+                core.setOutput('taskId', taskId)
+            });
+        } catch (error) {
+            console.error('rejecting promise', error);
+        }
+    } else {
+
+    }
+
+        
+}
+
 async function action() {
     const ACTION = core.getInput('action', {required: true});
     console.info('calling', ACTION);
@@ -284,6 +317,10 @@ async function action() {
         }
         case 'get-latest-repo-release': {
             getLatestRepositoryRelease();
+            break;
+        }
+        case 'create-asana-task': {
+            createAsanaTask();
             break;
         }
         default:
