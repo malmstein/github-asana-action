@@ -223,6 +223,32 @@ async function checkPRMembership(){
     }
 }
 
+async function getLatestRepositoryRelease(){
+    const 
+        GITHUB_PAT = core.getInput('github-pat', {required: true}),
+        githubClient = buildGithubClient(GITHUB_PAT),
+        ORG = core.getInput('github-org', {required: true}),
+        REPO = core.getInput('github-repository', {required: true});
+        
+    try {
+        await githubClient.request('GET /repos/{owner}/{repo}/releases/latest', {
+            org: ORG,
+            repo: REPO,
+            headers: {
+            'X-GitHub-Api-Version': '2022-11-28'
+            }
+        }).then((response) => {
+            const version = response.data.tag_name
+            console.log(REPO, `latest version is ${version}`)
+            core.setOutput('version', version)
+        });
+    } catch (error) {
+        console.log(REPO, `can't find latest version`)
+        core.setFailed(`can't find latest version for ${REPO}`);
+    }
+
+}
+
 async function action() {
     const ACTION = core.getInput('action', {required: true});
     console.info('calling', ACTION);
@@ -254,6 +280,10 @@ async function action() {
         }
         case 'create-asana-pr-task': {
             createPullRequestTask();
+            break;
+        }
+        case 'get-latest-repo-release': {
+            getLatestRepositoryRelease();
             break;
         }
         default:
