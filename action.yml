@@ -29,8 +29,8 @@ inputs:
     description: 'Github Repository to check for the latest release.'
     required: false
   github-org:
-  description: 'Github Organisation where the repository is hosted, to check for the latest release.'
-  required: false
+    description: 'Github Organisation where the repository is hosted, to check for the latest release.'
+    required: false
   
 branding:
   icon: 'chevron-right'
