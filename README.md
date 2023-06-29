@@ -25,6 +25,7 @@ This action integrates asana with github.
 * `add-asana-comment` adds a comment to the Asana task with the link to the Pull Request
 * `add-task-asana-project` adds a task to a project / section in Asana
 * `create-asana-pr-task` to create a task based on the Github Pull RequestAsana
+* `get-latest-repo-release` to find the latest release version of a Github Repository
 
 ### Create Asana task from Github Issue
 When a Github Issue has been added, it will create an Asana task with the Issue title, description and link.
@@ -208,4 +209,35 @@ jobs:
         with:          
           asana-project: 'Asana Project Id'
           action: 'create-asana-pr-task'
+```
+
+### Find the lastest release version of a Github Repositoryu
+Finds the latest release version of a Github Repository.
+
+### `github-repository`
+**Required** Repository to check for the latest version.
+
+### `github-org`
+**Required** Organisation that owns the Repository.
+
+#### Example Usage
+
+```yaml
+on:
+  workflow_dispatch:
+
+jobs:
+  find-latest-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.latest-release.outputs.version }}
+    steps:
+      - name: Find latest release of content scope scripts
+        id: latest-release
+        uses: malmstein/github-asana-action@master
+        with:
+          github-pat: 'Your Github PAT'
+          github-repository: 'Github Repository'
+          github-org: 'Github Organisation'
+          action: 'get-latest-repo-release'
 ```
