@@ -100,11 +100,9 @@ async function addTaskToAsanaProject(){
 
     const projectId = core.getInput('asana-project', {required: true});
     const sectionId = core.getInput('asana-section');
+    const taskId = core.getInput('asana-task-id', {required: true});
 
-    const foundTasks = findAsanaTasks()
-    for (const taskId of foundTasks) {
-        addTaskToProject(client, taskId, projectId, sectionId)        
-    }
+    addTaskToProject(client, taskId, projectId, sectionId)     
 }
 
 async function addTaskToProject(client, taskId, projectId, sectionId){
@@ -257,9 +255,24 @@ async function createAsanaTask(){
         taskDescription = core.getInput('asana-task-description', {required: true});
 
     const client = await buildAsanaClient();
-        
+
+    console.info('creating asana task', projectId);     
     if (!sectionId){
-        console.info('creating asana task', projectId);
+        try {
+            await client.tasks.create({            
+                projects: [projectId],
+                name: taskName,
+                notes: taskDescription,
+
+            }).then((response) => {
+                const taskId = response.data.gid
+                console.log(`task created with id ${taskId}`)
+                core.setOutput('taskId', taskId)
+            });
+        } catch (error) {
+            console.error('rejecting promise', error);
+        }
+    } else {
         try {
             await client.tasks.create({            
                 projects: [projectId],
@@ -275,11 +288,7 @@ async function createAsanaTask(){
         } catch (error) {
             console.error('rejecting promise', error);
         }
-    } else {
-
-    }
-
-        
+    }        
 }
 
 async function action() {
