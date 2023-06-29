@@ -298,40 +298,35 @@ async function addTaskPRDescription(){
         ORG = core.getInput('github-org', {required: true}),
         REPO = core.getInput('github-pr', {required: true}),
         PR = core.getInput('github-repository', {required: true}),
-        taskId = core.getInput('asana-task-id', {required: true});    
+        projectId = core.getInput('asana-project', {required: true}),
+        taskId = core.getInput('asana-task-id', {required: true});   
 
-    const data = await githubClient
-        .request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
-        ORG,
-        REPO,
-        pull_number: PR,
-        })
-        .then(({ data }) => data)
-        .catch((error) => core.error(error));
-
-    if (!data) {
-        core.setFailed(`Error while getting PR ${PR}`);
-        return 1;
-    }
-
-    let { body } = data;
-
-    const asanaTaskMessage = `Task/Issue URL: https://app.asana.com/0/1174433894299346/${taskId}/f`;
-    const updatedBody = `${asanaTaskMessage} \n\n ----- \n${body}`;
-
-    const updateResponse = await githubClient
-        .request('PATCH /repos/{owner}/{repo}/pulls/{pull_number}', {
-        ORG,
-        REPO,
-        pull_number: PR,
-        body: updatedBody,
-        })
-        .catch((error) => core.error(error));
-
-    if (!updateResponse) {
-        core.setFailed(`Error while updating PR ${PR}`);
-        return 1;
-    }
+        githubClient.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
+            owner: ORG,
+            repo: REPO,
+            pull_number: PR,
+            headers: {
+            'X-GitHub-Api-Version': '2022-11-28'
+            }
+            }).then((response) => {
+                console.log(response.data.body);
+                const body = response.data.body;
+                const asanaTaskMessage = `Task/Issue URL: https://app.asana.com/0/${projectId}/${taskId}/f`;        
+                const updatedBody = `${asanaTaskMessage} \n\n ----- \n${body}`;
+        
+                octokit.request('PATCH /repos/{owner}/{repo}/pulls/{pull_number}', {
+                    owner: ORG,
+                    repo: REPO,
+                    pull_number: PR,
+                    body: updatedBody,
+                    headers: {
+                        'X-GitHub-Api-Version': '2022-11-28'
+                        }
+                    })
+                    .catch((error) => core.error(error));
+        
+            });
+      
 }
 
 async function action() {
