@@ -232,7 +232,7 @@ async function getLatestRepositoryRelease(){
         
     try {
         await githubClient.request('GET /repos/{owner}/{repo}/releases/latest', {
-            org: ORG,
+            owner: ORG,
             repo: REPO,
             headers: {
             'X-GitHub-Api-Version': '2022-11-28'
