@@ -265,7 +265,7 @@ async function createAsanaTask(){
                 notes: taskDescription,
 
             }).then((response) => {
-                const taskId = response.data.gid
+                const taskId = response.gid
                 console.log(`task created with id ${taskId}`)
                 core.setOutput('taskId', taskId)
             });
