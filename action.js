@@ -296,8 +296,8 @@ async function addTaskPRDescription(){
         GITHUB_PAT = core.getInput('github-pat'),
         githubClient = buildGithubClient(GITHUB_PAT),
         ORG = core.getInput('github-org', {required: true}),
-        REPO = core.getInput('github-pr', {required: true}),
-        PR = core.getInput('github-repository', {required: true}),
+        REPO = core.getInput('github-repository', {required: true}),
+        PR = core.getInput('github-pr', {required: true}),
         projectId = core.getInput('asana-project', {required: true}),
         taskId = core.getInput('asana-task-id', {required: true});   
 
