@@ -314,7 +314,7 @@ async function addTaskPRDescription(){
                 const asanaTaskMessage = `Task/Issue URL: https://app.asana.com/0/${projectId}/${taskId}/f`;        
                 const updatedBody = `${asanaTaskMessage} \n\n ----- \n${body}`;
         
-                octokit.request('PATCH /repos/{owner}/{repo}/pulls/{pull_number}', {
+                githubClient.request('PATCH /repos/{owner}/{repo}/pulls/{pull_number}', {
                     owner: ORG,
                     repo: REPO,
                     pull_number: PR,
